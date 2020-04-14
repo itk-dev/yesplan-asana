@@ -3,12 +3,19 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\YesplanEventRepository")
  */
 class YesplanEvent
 {
+    /**
+     * Hook timestampable behavior
+     * updates createdAt, updatedAt fields
+     */
+    use TimestampableEntity;
+    
     /**
      * @ORM\Id()
      * @ORM\Column(type="string", length=255)
@@ -24,7 +31,7 @@ class YesplanEvent
     {
         return $this->id;
     }
-    
+
     public function setId(string $id): self
     {
         $this->id = $id;
