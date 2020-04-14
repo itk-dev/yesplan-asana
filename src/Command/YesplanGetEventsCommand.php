@@ -8,10 +8,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use App\Yesplan\EventManager;
 
 class YesplanGetEventsCommand extends Command
 {
     protected static $defaultName = 'app:yesplan:get-events';
+    
+    private $eventManager;
+
+    public function __construct(EventManager $eventManager){
+        parent::__construct();
+        $this->eventManager = $eventManager;
+        
+    }
 
     protected function configure()
     {
@@ -25,17 +34,7 @@ class YesplanGetEventsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('arg1');
-
-        if ($arg1) {
-            $io->note(sprintf('You passed an argument: %s', $arg1));
-        }
-
-        if ($input->getOption('option1')) {
-            // ...
-        }
-
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $this->eventManager->updateEvents();
 
         return 0;
     }
