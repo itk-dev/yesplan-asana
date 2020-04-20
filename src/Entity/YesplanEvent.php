@@ -48,7 +48,7 @@ class YesplanEvent
     private $genre;
 
     /**
-     * @ORM\Column(type="string", length=2500, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $marketing_budget;
 
@@ -63,7 +63,7 @@ class YesplanEvent
     private $presale_date;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $in_sale_date;
 
@@ -200,7 +200,7 @@ class YesplanEvent
         return $this;
     }
 
-    public function getInSaleDate(): ?string
+    public function getInSaleDate(): ?\DateTimeInterface
     {
         return $this->in_sale_date;
     }

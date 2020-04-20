@@ -1,34 +1,82 @@
 <?php
 
 namespace App\Yesplan;
+
 use App\Entity\YesplanEvent;
 use App\Repository\YesplanEventRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use DateTime;
 
-
-class EventManager{
+class EventManager
+{
 
     private $apiClient;
     private $eventRepository;
     private $entityManager;
 
-    public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager){
+    public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager)
+    {
         $this->apiClient = $apiClient;
         $this->eventRepository = $eventRepository;
         $this->entityManager = $entityManager;
     }
 
-    public function updateEvents():void
+    public function updateEvents(): void
     {
         $events = $this->apiClient->getEvents();
-        foreach($events as $data){
+        foreach ($events as $data) {
             $eventid = $data['id'];
             $event = $this->eventRepository->find($eventid);
-            if(null === $event){
+            if (null === $event) {
                 $event = new YesplanEvent();
                 $event->setId($eventid);
             }
             $event->setData($data);
+            $event->setTitle($data['title']);
+
+            $event->setMarketingBudget($data['marketing_budget']);
+            //    $event->setLocation($data['location']);
+            //   $event->setGenre($data['genre']);
+            $event->setGenre($data['genre']);
+
+            //     "value": "2020-05-01T12:00"
+            //     if(empty($data['publication_date'])){
+            //     $event->setPublicationDate(DateTime::createFromFormat("Y-m-d\TH:i",$data['publication_date']));
+            //    }
+
+            //if date is not empty convert to datetime before setting the value
+            if (!empty($data['publication_date'])) {
+                $publicationDate = DateTime::createFromFormat("Y-m-d\TH:i", $data['publication_date']);
+                //dont add date if conversion fails - should be logged
+                if ($publicationDate) {
+                    $event->setPublicationDate($publicationDate);
+                }
+            }
+            //if date is not empty convert to datetime before setting the value
+            if (!empty($data['presale_date'])) {
+                $presaleDate = DateTime::createFromFormat("Y-m-d\TH:i", $data['presale_date']);
+                //dont add date if conversion fails - should be logged
+                if ($presaleDate) {
+                    $event->setPresaleDate($presaleDate);
+                }
+            }
+            
+              //if date is not empty convert to datetime before setting the value
+              if (!empty($data['ticketinfo_sale'])) {
+                $saleDate = DateTime::createFromFormat("Y-m-d\TH:i", $data['ticketinfo_sale']);
+                //dont add date if conversion fails - should be logged
+                if ($saleDate) {
+                    $event->setInSaleDate($saleDate);
+                }
+            }
+
+            // $event->setEventDate(DateTime::createFromFormat("Y-m-d\TH:i",$data['eventDate']));
+
+
+
+
+
+
             $this->entityManager->persist($event);
         }
         $this->entityManager->flush();
