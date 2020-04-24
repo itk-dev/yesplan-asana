@@ -2,24 +2,24 @@
 
 namespace App\Command;
 
+use App\Yesplan\EventManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use App\Yesplan\EventManager;
 
 class YesplanGetEventsCommand extends Command
 {
     protected static $defaultName = 'app:yesplan:get-events';
-    
+
     private $eventManager;
 
-    public function __construct(EventManager $eventManager){
+    public function __construct(EventManager $eventManager)
+    {
         parent::__construct();
         $this->eventManager = $eventManager;
-        
     }
 
     protected function configure()
