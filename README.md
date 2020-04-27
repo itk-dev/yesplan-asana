@@ -14,5 +14,12 @@ docker-compose exec phpfpm bin/console doctrine:migrations:migrate --no-interact
 docker-compose exec phpfpm bin/console app:yesplan:get-events
 ```
 
+## Coding standards
 
+```sh
+docker-compose exec phpfpm composer coding-standards-check
+```
 
+```sh
+docker-compose exec phpfpm composer coding-standards-apply
+```
