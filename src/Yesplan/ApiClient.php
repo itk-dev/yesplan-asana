@@ -2,125 +2,185 @@
 
 namespace App\Yesplan;
 
-use Symfony\Component\HttpClient\CurlHttpClient;
-use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ApiClient
 {
-    public function getEvents(string $url, array $eventArray): array
+    private $options;
+    private $eventArray;
+
+    /** @var HttpClientInterface */
+    private $httpClient;
+
+    public function __construct(array $yesplanApiClientOptions)
     {
-        //https://musikhusetaarhus.yesplan.be/api/events/date%3A%23next10years/customdata?api_key=53FD0F325B0AE34B5D620ADFE6879F2D
-        $client = HttpClient::create();
-        $response = $client->request('GET', $url);
 
-        if ($response->getStatusCode() == "200") {
-            
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
 
-            $responseJson = json_decode($response->getContent(), true);
-            $id = "";
-            $responseArray = $response->toArray();
+        $this->options = $resolver->resolve($yesplanApiClientOptions);
+
+        $this->httpClient = HttpClient::create(['base_uri' => $this->options['url']]);
+
+        $this->eventArray = array();
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setRequired([
+            'apikey',
+            'url'
+
+        ]);
+    }
+    public function get(string $path, array $options): ResponseInterface
+    {
+        return $this->request("GET", $path, $options);
+    }
+    protected function request(string $method, string $path, array $options): ResponseInterface
+    {
+        return $this->httpClient->request($method, $path, $options);
+    }
+    public function getEvents(): array
+    {
+
+        //$client = HttpClient::create(['base_uri' => $this->options['url']]);
+
+        $url = "/api/events/date%3A%23next10years";
+        //  httpClient
+        while ($url !== null) {
+
+            $response = $this->get($url, ['query' => ['api_key' => $this->options['apikey']]]);
 
 
-            if (isset($responseArray["pagination"]["next"])) {
-                sleep(6);
-                $nextPageUrl = $responseArray["pagination"]["next"] . "&api_key=53FD0F325B0AE34B5D620ADFE6879F2D";
-                $eventArray = array_merge($eventArray, $this->getEvents($nextPageUrl, $eventArray));
-                //echo "page: " . $nextPageUrl;
+            if ($response->getStatusCode() === Response::HTTP_OK) { //http statuskode ok
+
+
+                $responseJson = json_decode($response->getContent(), true);
+                $id = "";
+                $responseArray = $response->toArray();
+
+
+
+                foreach ($responseArray["data"] as $data) {
+                    if (!empty($data["id"])) {
+                        $id = $data["id"];
+                        $this->eventArray[$id]['id'] = $id;
+                        $this->eventArray[$id]['data'] = $data;
+                        $this->eventArray[$id]['title'] = $data["name"];
+                        $this->eventArray[$id]['marketing_budget'] = "";
+                        $this->eventArray[$id]['genre'] = "";
+                        $this->eventArray[$id]['publication_date'] = "";
+                        $this->eventArray[$id]['ticketinfo_sale'] = "";
+                        $this->eventArray[$id]['presale_date'] = "";
+
+                        //if an event has multiple locations, this will only get the first
+                        $this->eventArray[$id]['location'] = $data["locations"][0]["name"];
+
+                        $this->eventArray[$id]['eventDate'] = $data["starttime"];
+                        /*
+                       
+                        */
+                    }
+                }
+            } else {
+                echo $response->getStatusCode();
+                echo $url;
+                //       echo $response->getHeaders();
             }
+            if (!empty($responseArray["pagination"]["next"])) {
+                $url = $responseArray["pagination"]["next"];
+            } else {
+                $url = null;
+            }
+        }
 
-            foreach ($responseArray["data"] as $data) {
 
-                $id = $data["event"]["id"];
-                $eventArray[$id]['id'] = $id;
-                $eventArray[$id]['data'] = $data;
-                $eventArray[$id]['title'] = $data["event"]["name"];
-                $eventArray[$id]['marketing_budget'] = "";
-                $eventArray[$id]['genre'] = "";
-                $eventArray[$id]['publication_date'] = "";
-                $eventArray[$id]['ticketinfo_sale'] = "";
-                $eventArray[$id]['presale_date'] = "";
+        //    echo count($eventArray);
+        //      print_r($eventArray);
+        return $this->eventArray;
+    }
+    private function getCustomData(string $id): void
+    {
+        $customDataUrl = $id . "/customdata";
 
-                $eventArray[$id]['location'] = "";
-                $eventArray[$id]['eventDate'] = "";
+        $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
 
-                //$eventArray[$id]['location'] = $data["event"]["name"];
-                $groups = $data["groups"];
+        if ($customDataResponse->getStatusCode() == "200") {
+            $customDataResponseArray = $customDataResponse->toArray();
 
-                foreach ($groups as $group) {
-                    $groupKeyword = $group["keyword"];
-                    //marketing budget
-                    //groups -> bugdetudgifter -> bugdetudgifter_andreudgifterekstern -> expences_marketing
-                    if ($groupKeyword == "budgetudgifter") {
-                        foreach ($group["children"] as $budgetExpenses) {
-                            if ($budgetExpenses["keyword"] == "budgetudgifter_andreudgifterekstern") {
-                                foreach ($budgetExpenses["children"] as $externalExpenses) {
-                                    if ($externalExpenses["keyword"] == "expences_marketing") {
-                                        $eventArray[$id]['marketing_budget'] = $externalExpenses["value"];
-                                    }
+            foreach ($customDataResponseArray["groups"] as $group) {
+                //Offentliggørelses dato
+                //I salg dato
+                //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
+
+
+                if ($group["keyword"] == "tix") {
+                    foreach ($group["children"] as $tix) {
+                        if ($tix["keyword"] == "tix_tixobligatoriskefelter") {
+                            foreach ($tix["children"] as $ticketPublic) {
+                                if ($ticketPublic["keyword"] == "ticketinfo_public") {
+                                    $this->eventArray[$id]['publication_date'] = $ticketPublic["value"];
                                 }
                             }
                         }
                     }
-                    //genre
-                    //groups -> generelinformation -> generelinformation_data -> eventinfo_web_categori
-                    if ($group["keyword"] == "generelinformation") {
-                        foreach ($group["children"] as $generelInformation) {
-                            if ($generelInformation["keyword"] == "generelinformation_data") {
-                                foreach ($generelInformation["children"] as $information) {
-                                    if ($information["keyword"] == "eventinfo_web_categori") {
+                }
+                //genre
+                //groups -> generelinformation -> generelinformation_data -> eventinfo_web_categori
+                if ($group["keyword"] == "generelinformation") {
+                    foreach ($group["children"] as $generelInformation) {
+                        if ($generelInformation["keyword"] == "generelinformation_data") {
+                            foreach ($generelInformation["children"] as $information) {
+                                if ($information["keyword"] == "eventinfo_web_categori") {
 
-                                        $eventArray[$id]['genre'] = $information["value"][0];
-                                    }
+                                    $this->eventArray[$id]['genre'] = $information["value"][0];
                                 }
                             }
                         }
                     }
-                    //Offentliggørelses dato
-                    //I salg dato
-                    //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
-                    if ($group["keyword"] == "tix") {
-                        foreach ($group["children"] as $tix) {
-                            if ($tix["keyword"] == "tix_tixobligatoriskefelter") {
-                                foreach ($tix["children"] as $ticketPublic) {
-                                    if ($ticketPublic["keyword"] == "ticketinfo_public") {
-                                        $eventArray[$id]['publication_date'] = $ticketPublic["value"];
-                                    }
-                                    if ($ticketPublic["keyword"] == "ticketinfo_sale") {
-                                        $eventArray[$id]['ticketinfo_sale'] = $ticketPublic["value"];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    //Presale dato + tid
-                    //groups -> billetforhold -> billetforhold_billetinformation -> ticketinfo_presaledatetime
-
-                    if ($group["keyword"] == "billetforhold") {
-                        foreach ($group["children"] as $ticketinformation) {
-                            if ($ticketinformation["keyword"] == "billetforhold_billetinformation") {
-                                foreach ($ticketinformation["children"] as $ticketinfo) {
-                                    if ($ticketinfo["keyword"] == "ticketinfo_presaledatetime") {
-                                        $eventArray[$id]['presale_date'] = $ticketinfo["value"];
-                                    }
+                }
+                //marketing budget
+                //groups -> bugdetudgifter -> bugdetudgifter_andreudgifterekstern -> expences_marketing
+                if ($group["keyword"]  == "budgetudgifter") {
+                    foreach ($group["children"] as $budgetExpenses) {
+                        if ($budgetExpenses["keyword"] == "budgetudgifter_andreudgifterekstern") {
+                            foreach ($budgetExpenses["children"] as $externalExpenses) {
+                                if ($externalExpenses["keyword"] == "expences_marketing") {
+                                    $this->eventArray[$id]['marketing_budget'] = $externalExpenses["value"];
                                 }
                             }
                         }
                     }
                 }
 
-                //  print_r($eventArray[$id]['genre']);
+                //Offentliggørelses dato
+                //I salg dato
+                //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
 
+
+                if ($group["keyword"] == "tix") {
+                    foreach ($group["children"] as $tix) {
+                        if ($tix["keyword"] == "tix_tixobligatoriskefelter") {
+                            foreach ($tix["children"] as $ticketPublic) {
+
+                                if ($ticketPublic["keyword"] == "ticketinfo_sale") {
+                                    $this->eventArray[$id]['ticketinfo_sale'] = $ticketPublic["value"];
+                                }
+                                if ($ticketPublic["keyword"] == "publication_date") {
+                                    $this->eventArray[$id]['publication_date'] = $ticketPublic["value"];
+                                }
+                            }
+                        }
+                    }
+                }
+                //  $eventArray = array_merge($this->getPresaleDate($group, $id, $eventArray), $eventArray);
             }
+            //  echo "customdata: OK";
 
         }
-        else{
-            echo $response->getStatusCode();
-     //       echo $response->getHeaders();
-        }
-
-    //    print_r($response->getHeaders());
-    //    echo count($eventArray);
-        return $eventArray;
     }
 }
