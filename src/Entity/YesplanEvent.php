@@ -10,12 +10,12 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  */
 class YesplanEvent
 {
-    /**
+    /*
      * Hook timestampable behavior
      * updates createdAt, updatedAt fields
      */
     use TimestampableEntity;
-    
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="string", length=255)
