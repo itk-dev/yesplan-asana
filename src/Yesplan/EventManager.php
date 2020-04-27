@@ -22,29 +22,16 @@ class EventManager
 
     public function updateEvents(): void
     {
-<<<<<<< HEAD
         $events = $this->apiClient->getEvents();
         //   echo 'updateEvents() count: ' . count($events);
-=======
-        $url = 'https://musikhusetaarhus.yesplan.be/api/events/date%3A%23next10years/customdata?api_key=53FD0F325B0AE34B5D620ADFE6879F2D';
-        $eventArray = [];
-        $events = $this->apiClient->getEvents($url, $eventArray);
-        echo 'updateEvents() count: '.count($events);
->>>>>>> d656e550e6a58c58ae843c0d0ff63e436da71c8f
         foreach ($events as $data) {
             $eventid = $data['id'];
             $event = $this->eventRepository->find($eventid);
             if (null === $event) {
                 $event = new YesplanEvent();
                 $event->setId($eventid);
-<<<<<<< HEAD
             }
 
-=======
-            } else {
-                //  echo $data['id'] . " ";
-            }
->>>>>>> d656e550e6a58c58ae843c0d0ff63e436da71c8f
             $event->setData($data);
             $event->setTitle($data['title']);
 
@@ -73,11 +60,7 @@ class EventManager
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['ticketinfo_sale'])) {
-<<<<<<< HEAD
                 $saleDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['ticketinfo_sale']);
-=======
-                $saleDate = DateTime::createFromFormat("Y-m-d\TH:i", $data['ticketinfo_sale']);
->>>>>>> d656e550e6a58c58ae843c0d0ff63e436da71c8f
                 //dont add date if conversion fails - should be logged
                 if ($saleDate) {
                     $event->setInSaleDate($saleDate);
