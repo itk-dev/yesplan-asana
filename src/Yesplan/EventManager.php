@@ -85,4 +85,16 @@ class EventManager
         }
         $this->entityManager->flush();
     }
+
+    public function deleteOldEvents():void
+    {
+        $events = $this->eventRepository->findOldEvents();
+
+        foreach($events as $event){
+            $this->entityManager->remove($event);
+            print_r($event->getId());
+        }
+        $this->entityManager->flush();
+      
+    }
 }

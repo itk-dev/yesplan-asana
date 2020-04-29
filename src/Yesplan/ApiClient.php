@@ -49,7 +49,7 @@ class ApiClient
 
         //$client = HttpClient::create(['base_uri' => $this->options['url']]);
 
-        $url = "/api/events/date%3A%23next10years";
+        $url = "/api/events/";
         //  httpClient
         while ($url !== null) {
 
@@ -76,7 +76,7 @@ class ApiClient
                         $this->eventArray[$id]['presale_date'] = "";
 
                         //if an event has multiple locations, this will only get the first
-                        $this->eventArray[$id]['location'] = $data["locations"][0]["name"];
+              //          $this->eventArray[$id]['location'] = $data["locations"][0]["name"];
 
                         $this->eventArray[$id]['eventDate'] = $data["starttime"];
                         /*

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\YesplanEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use \Datetime;
 
 /**
  * @method YesplanEvent|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,6 +18,24 @@ class YesplanEventRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, YesplanEvent::class);
+    }
+
+    /**
+     * @return YesplanEvent[]
+     */
+    public function findOldEvents(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $timeNow = new DateTime('NOW');
+
+        $query = $entityManager->createQuery(
+            'SELECT p
+            FROM App\Entity\YesplanEvent p
+            WHERE p.eventDate < :timeNow
+            ORDER BY p.eventDate ASC'
+        )->setParameter('timeNow', $timeNow->format('Y-m-d H:i:s:'));
+        // returns an array of event id's
+        return $query->getResult();
     }
 
     // /**
