@@ -41,6 +41,15 @@ class EventManager
 
             $event->setLocation($data['location']);
 
+            $event->setTicketCapacity($data['capacity']);
+            $event->setTicketsAllocated($data['allocated']);
+            $event->setTicketsBlocked($data['blocked']);
+            $event->setTicketsReserved($data['ticketsreserved']);
+            $event->setTicketsAvailable($data['ticketsavailable']);
+
+            $event->setProductionOnline($data['productionOnline']);
+            $event->setEventOnline($data['eventOnline']);
+
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['publication_date'])) {
                 $publicationDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['publication_date']);

@@ -49,7 +49,7 @@ class ApiClient
 
         //$client = HttpClient::create(['base_uri' => $this->options['url']]);
 
-        $url = "/api/events/";
+        $url = 'api/events/event%3Adate%3A29-04-2020%20TO%2020-04-2030';
         //  httpClient
         while ($url !== null) {
 
@@ -73,10 +73,23 @@ class ApiClient
                         $this->eventArray[$id]['genre'] = "";
                         $this->eventArray[$id]['publication_date'] = "";
                         $this->eventArray[$id]['ticketinfo_sale'] = "";
+                        $this->eventArray[$id]['eventonline'] = "";
+                        $this->eventArray[$id]['productiononline'] = "";
                         $this->eventArray[$id]['presale_date'] = "";
+                        $this->eventArray[$id]['location'] = '';
+                        $this->eventArray[$id]['ticketsavailable'] = '';
+                        $this->eventArray[$id]['ticketsreserved'] = '';
+                        $this->eventArray[$id]['capacity'] = '';
+                        $this->eventArray[$id]['blocked'] = '';
+                        $this->eventArray[$id]['allocated'] = '';
+
 
                         //if an event has multiple locations, this will only get the first
-              //          $this->eventArray[$id]['location'] = $data["locations"][0]["name"];
+
+                        if (!empty($data['locations']['next'])) {
+                            $this->eventArray[$id]['location'] = $data['locations'][0]['name'];
+                        }
+
 
                         $this->eventArray[$id]['eventDate'] = $data["starttime"];
                         /*
@@ -86,7 +99,8 @@ class ApiClient
                 }
             } else {
                 echo $response->getStatusCode();
-                echo $url;
+                print_r($response->header);
+            break;
                 //       echo $response->getHeaders();
             }
             if (!empty($responseArray["pagination"]["next"])) {
@@ -163,13 +177,38 @@ class ApiClient
                 if ($group["keyword"] == "tix") {
                     foreach ($group["children"] as $tix) {
                         if ($tix["keyword"] == "tix_tixobligatoriskefelter") {
-                            foreach ($tix["children"] as $ticketPublic) {
+                            foreach ($tix['children'] as $ticketPublic) {
 
-                                if ($ticketPublic["keyword"] == "ticketinfo_sale") {
+                                if ($ticketPublic['keyword'] == 'ticketinfo_sale') {
                                     $this->eventArray[$id]['ticketinfo_sale'] = $ticketPublic["value"];
                                 }
-                                if ($ticketPublic["keyword"] == "publication_date") {
-                                    $this->eventArray[$id]['publication_date'] = $ticketPublic["value"];
+                                if ($ticketPublic['keyword'] == 'publication_date') {
+                                    $this->eventArray[$id]['publication_date'] = $ticketPublic['value'];
+                                }
+                            }
+                        }
+                        if ($tix['keyword'] == 'tix_billetsalgtix') {
+                            foreach ($tix['children'] as $billetsalg) {
+                                if ($billetsalg['keyword'] == 'ticketinfo_sale') {
+                                    $this->eventArray[$id]['productiononline'] = $billetsalg["value"];
+                                }
+                                if ($billetsalg['keyword'] == 'tixintegrations_eventonline') {
+                                    $this->eventArray[$id]['eventonline'] = $billetsalg["value"];
+                                }
+                                if ($billetsalg['keyword'] == 'tixintegration_ticketsavailable') {
+                                    $this->eventArray[$id]['ticketsavailable'] = $billetsalg["value"];
+                                }
+                                if ($billetsalg['keyword'] == 'tixintegration_ticketsreserved') {
+                                    $this->eventArray[$id]['ticketsreserved'] = $billetsalg["value"];
+                                }
+                                if ($billetsalg['keyword'] == 'tixintegrations_capacity') {
+                                    $this->eventArray[$id]['capacity'] = $billetsalg["value"];
+                                }
+                                if ($billetsalg['keyword'] == 'tixintegrations_blocked') {
+                                    $this->eventArray[$id]['blocked'] = $billetsalg["value"];
+                                }
+                                if ($billetsalg['keyword'] == 'tixintegrations_allocated') {
+                                    $this->eventArray[$id]['allocated'] = $billetsalg["value"];
                                 }
                             }
                         }

@@ -92,6 +92,16 @@ class YesplanEvent
      */
     private $tickets_allocated;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $productionOnline;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $eventOnline;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -268,6 +278,30 @@ class YesplanEvent
     public function setTicketsAllocated(?int $tickets_allocated): self
     {
         $this->tickets_allocated = $tickets_allocated;
+
+        return $this;
+    }
+
+    public function getProductionOnline(): ?bool
+    {
+        return $this->productionOnline;
+    }
+
+    public function setProductionOnline(?bool $productionOnline): self
+    {
+        $this->productionOnline = $productionOnline;
+
+        return $this;
+    }
+
+    public function getEventOnline(): ?bool
+    {
+        return $this->eventOnline;
+    }
+
+    public function setEventOnline(?bool $eventOnline): self
+    {
+        $this->eventOnline = $eventOnline;
 
         return $this;
     }
