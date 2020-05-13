@@ -36,27 +36,30 @@ class AsanaEventManager
 
         foreach ($lastMinutEvents as $lastMinuteEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
-            $this->asanaApiClient->createCardLastMinute($lastMinuteEvent['id'], $eventData['titel'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
+            $this->asanaApiClient->createCardLastMinute($eventData['titel'], $lastMinuteEvent['id'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
             $this->cardCreated($lastMinuteEvent['id'], 'LastMinute');
         }
 
+
         foreach ($fewTicketEvents as $fewTicketEvent) {
-            $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
-            $this->asanaApiClient->createCartFewTickets($fewTicketEvent['id'], $eventData['titel'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
+            $eventData = $this->getEventData($this->eventRepository->find($fewTicketEvent['id']));
+            $this->asanaApiClient->createCartFewTickets($eventData['titel'], $fewTicketEvent['id'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
             $this->cardCreated($fewTicketEvent['id'], 'FewTickets');
         }
+        
 
         foreach ($eventsOnlineEvents as $eventsOnlineEvent) {
-            $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
-            $this->asanaApiClient->createCardsEventOnline($eventsOnlineEvent['id'], $eventData['titel'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
-            $this->cardCreated($eventsOnlineEvent['id'], 'FewTickets');
+            $eventData = $this->getEventData($this->eventRepository->find($eventsOnlineEvent['id']));
+            $this->asanaApiClient->createCardsEventOnline($eventData['titel'], $eventsOnlineEvent['id'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
+            $this->cardCreated($eventsOnlineEvent['id'], 'EventsOnline');
         }
 
         foreach ($eventsNewEvents as $eventsNewEvent) {
-            $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
-            $this->asanaApiClient->createCardNewEventsBoard($eventsNewEvent['id'], $eventData['titel'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
-            $this->cardCreated($eventsNewEvent['id'], 'FewTickets');
+            $eventData = $this->getEventData($this->eventRepository->find($eventsNewEvent['id']));
+            $this->asanaApiClient->createCardNewEventsBoard($eventData['titel'], $eventsNewEvent['id'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
+            $this->cardCreated($eventsNewEvent['id'], 'Events');
         }
+        
     }
 
     private function getEventData(YesplanEvent $event): array
@@ -94,7 +97,7 @@ class AsanaEventManager
                 $card->setCreatedInFewTickets(true);
                 break;
             case 'EventsOnline':
-                $card->getCreatedInNewEventsOnline(true);
+                $card->setCreatedInNewEventsOnline(true);
                 break;
             case 'Events':
                 $card->setCreatedInNewEvents(true);

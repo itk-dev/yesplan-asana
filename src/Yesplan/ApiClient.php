@@ -6,6 +6,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class ApiClient
 {
@@ -103,9 +104,13 @@ class ApiClient
                 } else {
                     $url = null;
                 }
-            } else {
-                echo $response->getStatusCode();
+            } else if ($response->getStatusCode() === Response::HTTP_TOO_MANY_REQUESTS) {
                 sleep(6);
+            } else {
+
+                echo $response->getStatusCode();
+                //Log error and id
+
                 //       echo $response->getHeaders();
             }
         }
@@ -120,7 +125,7 @@ class ApiClient
         $customDataUrl = 'api/event/' . $id . '/customdata';
 
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
-        if ($customDataResponse->getStatusCode() == "200") {
+        if ($customDataResponse->getStatusCode()  === Response::HTTP_OK) {
 
             $customDataResponseArray = $customDataResponse->toArray();
 
@@ -219,11 +224,11 @@ class ApiClient
                 }
                 //  $eventArray = array_merge($this->getPresaleDate($group, $id, $eventArray), $eventArray);
             }
-     
-        } else {
-            echo $customDataResponse->getStatusCode();
+        } else if ($customDataResponse->getStatusCode()  === Response::HTTP_TOO_MANY_REQUESTS) {
             sleep(6);
             $this->getCustomData($id);
+        } else {
+           //log error and id
             //print_r( $customDataResponse->getHeaders());
 
         }
