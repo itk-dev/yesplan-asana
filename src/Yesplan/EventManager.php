@@ -6,6 +6,7 @@ use App\Entity\YesplanEvent;
 use App\Repository\YesplanEventRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Decimal\Decimal;
 
 class EventManager
 {
@@ -41,14 +42,22 @@ class EventManager
 
             $event->setLocation($data['location']);
 
-            $event->setTicketCapacity($data['capacity']);
-            $event->setTicketsAllocated($data['allocated']);
-            $event->setTicketsBlocked($data['blocked']);
-            $event->setTicketsReserved($data['ticketsreserved']);
-            $event->setTicketsAvailable($data['ticketsavailable']);
+            $event->setTicketCapacity(intval($data['capacity']));
+            $event->setTicketsAllocated(intval($data['allocated']));
+            $event->setTicketsBlocked(intval($data['blocked']));
+            $event->setTicketsReserved(intval($data['ticketsreserved']));
+            $event->setTicketsAvailable(intval($data['ticketsavailable']));
 
-            $event->setProductionOnline($data['productionOnline']);
-            $event->setEventOnline($data['eventOnline']);
+            $event->setProductionOnline($data['productiononline']);
+            $event->setEventOnline($data['eventonline']);
+
+            $calculateCapacityPercentage = 0;
+
+            //(tixintegrations_ticketsavailable + tixintegrations_ticketsreserved) / (tixintegrations_capacity - tixintegrations_blocked - tixintegrations_allocated) * 100
+            if ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated() > 0) {
+                $calculateCapacityPercentage = ($event->getTicketsAvailable() + $event->getTicketsReserved()) / ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated()) * 100;
+            }
+            $event->setCapacityPercent($calculateCapacityPercentage);
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['publication_date'])) {
@@ -78,14 +87,13 @@ class EventManager
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['eventDate'])) {
-                
+
                 $eventDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['eventDate']);
                 //2029-06-18T13:00:00+02:00
-              //  echo 'trnsaformed' . $eventDate . '.' .  $data['eventDate'];
+                //  echo 'trnsaformed' . $eventDate . '.' .  $data['eventDate'];
                 //dont add date if conversion fails - should be logged
                 if ($eventDate) {
                     $event->setEventDate($eventDate);
-                   
                 }
             }
             // $event->setEventDate(DateTime::createFromFormat('Y-m-d\TH:i',$data['eventDate']));
@@ -95,15 +103,14 @@ class EventManager
         $this->entityManager->flush();
     }
 
-    public function deleteOldEvents():void
+    public function deleteOldEvents(): void
     {
         $events = $this->eventRepository->findOldEvents();
 
-        foreach($events as $event){
+        foreach ($events as $event) {
             $this->entityManager->remove($event);
-            print_r($event->getId());
+          //  print_r($event->getId());
         }
         $this->entityManager->flush();
-      
     }
 }

@@ -15,6 +15,13 @@ services:
             $yesplanApiClientOptions: 
                 url: '%env(YESPLAN_URL)%'
                 apikey: '%env(YESPLAN_APIKEY)%'
+            $asanaApiClientOptions:
+                bearer: '%env(ASANA_BEARER)%'
+                asana_url: '%env(ASANA_URL)%'
+                asana_new_event: '%env(ASANA_NEW_EVENT)%'
+                asana_new_event_online: '%env(ASANA_NEW_EVENT_ONLINE)%'
+                asana_last_minute: '%env(ASANA_LAST_MINUTE)%'
+                asana_few_tickets: '%env(ASANA_FEW_TICKETS)%'
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:

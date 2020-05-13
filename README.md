@@ -13,6 +13,13 @@ docker-compose exec phpfpm bin/console doctrine:migrations:migrate --no-interact
 ```sh
 docker-compose exec phpfpm bin/console app:yesplan:get-events
 ```
+```sh
+docker-compose exec phpfpm bin/console app:yesplan:delete-old-events
+```
+
+```sh
+docker-compose exec phpfpm bin/console app:asana:createCards
+```
 
 ## Coding standards
 

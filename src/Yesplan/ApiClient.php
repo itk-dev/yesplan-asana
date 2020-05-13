@@ -49,7 +49,7 @@ class ApiClient
 
         //$client = HttpClient::create(['base_uri' => $this->options['url']]);
 
-        $url = 'api/events/event%3Adate%3A29-04-2020%20TO%2020-04-2030';
+        $url = 'api/events/event%3Adate%3A29-04-2020%20TO%2020-04-2021';
         //  httpClient
         while ($url !== null) {
 
@@ -95,18 +95,18 @@ class ApiClient
                         /*
                        
                         */
+                        $this->getCustomData($id);
                     }
+                }
+                if (!empty($responseArray["pagination"]["next"])) {
+                    $url = $responseArray["pagination"]["next"];
+                } else {
+                    $url = null;
                 }
             } else {
                 echo $response->getStatusCode();
-                print_r($response->header);
-            break;
+                sleep(6);
                 //       echo $response->getHeaders();
-            }
-            if (!empty($responseArray["pagination"]["next"])) {
-                $url = $responseArray["pagination"]["next"];
-            } else {
-                $url = null;
             }
         }
 
@@ -117,11 +117,11 @@ class ApiClient
     }
     private function getCustomData(string $id): void
     {
-        $customDataUrl = $id . "/customdata";
+        $customDataUrl = 'api/event/' . $id . '/customdata';
 
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
-
         if ($customDataResponse->getStatusCode() == "200") {
+
             $customDataResponseArray = $customDataResponse->toArray();
 
             foreach ($customDataResponseArray["groups"] as $group) {
@@ -175,6 +175,7 @@ class ApiClient
 
 
                 if ($group["keyword"] == "tix") {
+
                     foreach ($group["children"] as $tix) {
                         if ($tix["keyword"] == "tix_tixobligatoriskefelter") {
                             foreach ($tix['children'] as $ticketPublic) {
@@ -187,9 +188,11 @@ class ApiClient
                                 }
                             }
                         }
+
                         if ($tix['keyword'] == 'tix_billetsalgtix') {
+
                             foreach ($tix['children'] as $billetsalg) {
-                                if ($billetsalg['keyword'] == 'ticketinfo_sale') {
+                                if ($billetsalg['keyword'] == 'tixintegrations_productiononline') {
                                     $this->eventArray[$id]['productiononline'] = $billetsalg["value"];
                                 }
                                 if ($billetsalg['keyword'] == 'tixintegrations_eventonline') {
@@ -216,7 +219,12 @@ class ApiClient
                 }
                 //  $eventArray = array_merge($this->getPresaleDate($group, $id, $eventArray), $eventArray);
             }
-            //  echo "customdata: OK";
+     
+        } else {
+            echo $customDataResponse->getStatusCode();
+            sleep(6);
+            $this->getCustomData($id);
+            //print_r( $customDataResponse->getHeaders());
 
         }
     }

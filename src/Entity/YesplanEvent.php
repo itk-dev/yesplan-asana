@@ -102,6 +102,11 @@ class YesplanEvent
      */
     private $eventOnline;
 
+    /**
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
+     */
+    private $capacityPercent;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -302,6 +307,18 @@ class YesplanEvent
     public function setEventOnline(?bool $eventOnline): self
     {
         $this->eventOnline = $eventOnline;
+
+        return $this;
+    }
+
+    public function getCapacityPercent(): ?string
+    {
+        return $this->capacityPercent;
+    }
+
+    public function setCapacityPercent(?string $capacityPercent): self
+    {
+        $this->capacityPercent = $capacityPercent;
 
         return $this;
     }
