@@ -2,27 +2,34 @@
 
 namespace App\Yesplan;
 
+use App\Controller\Logger as ControllerLogger;
 use App\Entity\YesplanEvent;
 use App\Repository\YesplanEventRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Decimal\Decimal;
 
+use Monolog\Logger as MonologLogger;
+
 class EventManager
 {
     private $apiClient;
     private $eventRepository;
     private $entityManager;
+    private $logger;
 
-    public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager)
+    public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager, MonologLogger $loggerController)
     {
         $this->apiClient = $apiClient;
         $this->eventRepository = $eventRepository;
         $this->entityManager = $entityManager;
+        $this->logger = $loggerController;
     }
 
     public function updateEvents(): void
     {
+        $this->logger->info('update events');
+        
         $events = $this->apiClient->getEvents();
         //   echo 'updateEvents() count: ' . count($events);
         foreach ($events as $data) {
@@ -105,6 +112,8 @@ class EventManager
 
     public function deleteOldEvents(): void
     {
+        $this->logger->info('Deleting events');
+
         $events = $this->eventRepository->findOldEvents();
 
         foreach ($events as $event) {

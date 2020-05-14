@@ -6,17 +6,22 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-use Psr\Log\LoggerInterface;
+
+use Monolog\Logger as MonologLogger;
+
 
 class ApiClient
 {
     private $options;
     private $eventArray;
+    private $logger;
 
     /** @var HttpClientInterface */
     private $httpClient;
 
-    public function __construct(array $yesplanApiClientOptions)
+    
+
+    public function __construct(array $yesplanApiClientOptions, MonologLogger $logger)
     {
 
         $resolver = new OptionsResolver();
@@ -27,6 +32,7 @@ class ApiClient
         $this->httpClient = HttpClient::create(['base_uri' => $this->options['url']]);
 
         $this->eventArray = array();
+        $this->logger = $logger;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -47,6 +53,7 @@ class ApiClient
     }
     public function getEvents(): array
     {
+        $this->logger->info('get events running');
 
         //$client = HttpClient::create(['base_uri' => $this->options['url']]);
 
@@ -106,18 +113,10 @@ class ApiClient
                 }
             } else if ($response->getStatusCode() === Response::HTTP_TOO_MANY_REQUESTS) {
                 sleep(6);
-            } else {
-
-                echo $response->getStatusCode();
-                //Log error and id
-
-                //       echo $response->getHeaders();
+            } else { 
+                $this->logger->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
             }
         }
-
-
-        //    echo count($eventArray);
-        //      print_r($eventArray);
         return $this->eventArray;
     }
     private function getCustomData(string $id): void
@@ -222,15 +221,12 @@ class ApiClient
                         }
                     }
                 }
-                //  $eventArray = array_merge($this->getPresaleDate($group, $id, $eventArray), $eventArray);
             }
         } else if ($customDataResponse->getStatusCode()  === Response::HTTP_TOO_MANY_REQUESTS) {
             sleep(6);
             $this->getCustomData($id);
         } else {
-           //log error and id
-            //print_r( $customDataResponse->getHeaders());
-
+            $this->logger->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $id, 'url' => $customDataUrl]);
         }
     }
 }
