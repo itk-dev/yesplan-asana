@@ -17,22 +17,27 @@ use Symfony\Component\Mime\Email;
 class MailerController extends AbstractController
 {
     private $mailer;
+    private $to = 'lilosti@aarhus.dk';
+    private $prefix = 'dev';
 
     public function __construct(MailerInterface $mailer)
     {
         $this->mailer = $mailer;
     }
 
-    public function sendEmail(string $to, string $subject, string $message)
+    /**
+     * Send email to mail-adress defined in env, hvis subject prefix defined in env.
+     */
+    public function sendEmail(string $subject, string $message): void
     {
         $email = (new Email())
             ->from('asanayesplanintegration@musikhusaarhus.dk')
-            ->to($to)
+            ->to($this->to)
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
-            ->subject($subject)
+            ->subject($this->prefix.' '.$subject)
             ->text($message)
             ->html($message);
 

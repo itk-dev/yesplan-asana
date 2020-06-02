@@ -31,12 +31,14 @@ class EventManager
         $this->logger = $logger;
     }
 
+    /**
+     * Create events from Yesplan in local database.
+     */
     public function updateEvents(): void
     {
         $this->logger->info('update events');
 
         $events = $this->apiClient->getEvents();
-        //   echo 'updateEvents() count: ' . count($events);
         foreach ($events as $data) {
             $eventid = $data['id'];
             $event = $this->eventRepository->find($eventid);
@@ -114,6 +116,9 @@ class EventManager
         $this->entityManager->flush();
     }
 
+    /**
+     * Delete old events from local database.
+     */
     public function deleteOldEvents(): void
     {
         $this->logger->info('Deleting events');

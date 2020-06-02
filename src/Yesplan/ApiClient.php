@@ -11,6 +11,8 @@
 namespace App\Yesplan;
 
 use App\Controller\MailerController;
+use DateInterval;
+use Datetime;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,8 +25,6 @@ class ApiClient
     private $eventArray;
     private $logger;
     private $mailer;
-
-    /** @var HttpClientInterface */
     private $httpClient;
 
     public function __construct(array $yesplanApiClientOptions, LoggerInterface $logger, MailerController $mailer)
@@ -41,6 +41,9 @@ class ApiClient
         $this->mailer = $mailer;
     }
 
+    /**
+     * Resolve env variables.
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
@@ -59,14 +62,23 @@ class ApiClient
         return $this->httpClient->request($method, $path, $options);
     }
 
+    /**
+     * Get all events from now + 10 years from Yesplan.
+     */
     public function getEvents(): array
     {
-        $this->logger->info('get events running');
+        $this->logger->info('Get events running');
 
         //$client = HttpClient::create(['base_uri' => $this->options['url']]);
 
-        $url = 'api/events/event%3Adate%3A29-04-2020%20TO%2020-04-2030';
-        //  httpClient
+        $timeNow = new DateTime('NOW');
+        $time10Years = new DateTime('NOW');
+
+        $time10Years->add(new DateInterval('P10Y'));
+        //$timeNow->format('Y-m-d H:i:s:')
+        $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$time10Years->format('d-m-Y');
+
+        $url = 'api/events/event%3Adate%3A'.$dateString;
         while (null !== $url) {
             $response = $this->get($url, ['query' => ['api_key' => $this->options['apikey']]]);
 
@@ -112,9 +124,10 @@ class ApiClient
                     $url = null;
                 }
             } elseif (Response::HTTP_TOO_MANY_REQUESTS === $response->getStatusCode()) {
+                //if Yesplan receives to many requests, take a coffee break
                 sleep(6);
             } else {
-                $this->mailer->sendEmail('lilosti@aarhus.dk', 'Error getting data', 'Error '.$response->getStatusCode().'URL: '.$url);
+                $this->mailer->sendEmail('Error getting data', 'Error '.$response->getStatusCode().'URL: '.$url);
                 $this->logger->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
             }
         }
@@ -122,6 +135,11 @@ class ApiClient
         return $this->eventArray;
     }
 
+    /**
+     * Get customdata from Yesplan by eventID.
+     *
+     * @return YesplanEvent[]
+     */
     private function getCustomData(string $id): void
     {
         $customDataUrl = 'api/event/'.$id.'/customdata';
@@ -219,10 +237,12 @@ class ApiClient
                 }
             }
         } elseif (Response::HTTP_TOO_MANY_REQUESTS === $customDataResponse->getStatusCode()) {
+            //if Yesplan API receives to many requests, take a short break, and continue
             sleep(6);
             $this->getCustomData($id);
         } else {
-            $this->mailer->sendEmail('lilosti@aarhus.dk', 'Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$id);
+            //something failed
+            $this->mailer->sendEmail('Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$id);
             $this->logger->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $id, 'url' => $customDataUrl]);
         }
     }

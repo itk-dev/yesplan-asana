@@ -31,13 +31,19 @@ class AsanaEventManager
         $this->asanaEventRepository = $asanaEventRepository;
     }
 
+    /**
+     * Create cards on boards depending on the events in yesplanEvents table
+     * After creatioon AsanaEvent table is updated with information on where the card has been created.
+     */
     public function createCards(): void
     {
+        //get Yesplan events for the different boards/card types
         $lastMinutEvents = $this->eventRepository->findLastMinutTickets();
         $fewTicketEvents = $this->eventRepository->findFewTickets();
         $eventsOnlineEvents = $this->eventRepository->findNewEventOnlineEvents();
         $eventsNewEvents = $this->eventRepository->findNewProductionOnlineEvents();
 
+        //create the cards, and update asanaEvent table
         foreach ($lastMinutEvents as $lastMinuteEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
             $this->asanaApiClient->createCardLastMinute($eventData);
@@ -63,6 +69,9 @@ class AsanaEventManager
         }
     }
 
+    /**
+     * returns an array containing neccessary event data for 1 event.
+     */
     private function getEventData(YesplanEvent $event): array
     {
         $eventArray = [
@@ -81,14 +90,18 @@ class AsanaEventManager
         return $eventArray;
     }
 
+    /**
+     * Updates database when a new card has been created.
+     *
+     * @param id yesplan-id of the event created
+     * @param type the type of card created - LastMinute, FewTickets, EventsOnline or Events
+     */
     private function cardCreated(string $id, string $type)
     {
         $card = $this->asanaEventRepository->find($id);
         if (null === $card) {
-            //    echo $cardid;
             $card = new AsanaEvent();
             $card->setId($id);
-            //    echo $card->getId();
         }
         switch ($type) {
             case 'LastMinute':

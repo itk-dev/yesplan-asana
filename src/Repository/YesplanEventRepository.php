@@ -31,6 +31,8 @@ class YesplanEventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns all events older than today.
+     *
      * @return YesplanEvent[]
      */
     public function findOldEvents(): array
@@ -47,6 +49,11 @@ class YesplanEventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    /**
+     * Finds all events with productionOnline = 1.
+     *
+     * @return YesplanEvent[]
+     */
     public function findNewProductionOnlineEvents(): array
     {
         //get all events with productiononline = 1 not already created in Asana
@@ -63,6 +70,11 @@ class YesplanEventRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * Finds all events with eventOnline = 1.
+     *
+     * @return YesplanEvent[]
+     */
     public function findNewEventOnlineEvents(): array
     {
         //get all events with eventonline = 1 not already created in Asana
@@ -78,6 +90,12 @@ class YesplanEventRepository extends ServiceEntityRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * Finds all events with more than 90 % tickets sold
+     * == less than 10% tickets are left.
+     *
+     * @return YesplanEvent[]
+     */
     public function findFewTickets(): array
     {
         //(tixintegrations_ticketsavailable + tixintegrations_ticketsreserved) / (tixintegrations_capacity - tixintegrations_blocked - tixintegrations_allocated) * 100
@@ -87,7 +105,7 @@ class YesplanEventRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
-        SELECT y.id FROM yesplan_event y LEFT JOIN asana_event a ON y.id=a.id WHERE y.capacity_percent >= 10 AND  (a.created_in_few_tickets is null OR a.created_in_few_tickets = 0)
+        SELECT y.id FROM yesplan_event y LEFT JOIN asana_event a ON y.id=a.id WHERE y.capacity_percent >= 90 AND  (a.created_in_few_tickets is null OR a.created_in_few_tickets = 0)
             ';
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
@@ -107,11 +125,16 @@ class YesplanEventRepository extends ServiceEntityRepository
     //   return $qb->getQuery()->getResult();
     }
 
+    /**
+     * Finds all events with less than 75% tickets sold less than 3 weeks before the event
+     * == more than 25% tickets left 3 weeks before event.
+     *
+     * @return YesplanEvent[]
+     */
     public function findLastMinutTickets(): array
     {
         //(tixintegrations_ticketsavailable + tixintegrations_ticketsreserved) / (tixintegrations_capacity - tixintegrations_blocked - tixintegrations_allocated) * 100
         //<25% + 3 weeks before event
-        $entityManager = $this->getEntityManager();
         $nowPlus3Weeks = new DateTime('NOW');
         $nowPlus3Weeks->add(new DateInterval('P21D'));
 
@@ -125,33 +148,4 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         return $stmt->fetchAll();
     }
-
-    // /**
-    //  * @return YesplanEvent[] Returns an array of YesplanEvent objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('y')
-            ->andWhere('y.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('y.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?YesplanEvent
-    {
-        return $this->createQueryBuilder('y')
-            ->andWhere('y.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

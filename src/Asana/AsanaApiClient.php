@@ -20,8 +20,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class AsanaApiClient
 {
     private $options;
-    //   private $asanaEventManager;
-    private $eventDateFieldID = '1234567890';
     private $mailer;
     private $logger;
     /** @var HttpClientInterface */
@@ -39,10 +37,6 @@ class AsanaApiClient
         $bearer = $this->options['bearer'];
 
         $this->httpClient = HttpClient::create(['headers' => ['Authorization' => 'Bearer '.$bearer]]);
-
-        //   $this->asanaEventManager = $asanaEventManagers;
-
-        // $this->httpClient = HttpClient::create(['base_uri' => $this->options['url']]);
     }
 
     public function post(string $path, array $options): ResponseInterface
@@ -52,7 +46,6 @@ class AsanaApiClient
 
     protected function request(string $method, string $path, array $options): ResponseInterface
     {
-        //  print_r($options);
         return $this->httpClient->request($method, $path, $options);
     }
 
@@ -77,6 +70,9 @@ class AsanaApiClient
         ]);
     }
 
+    /**
+     * Create cards on the boards in env var ASANA_NEW_EVENT.
+     */
     //new events
     public function createCardNewEventsBoard(array $values): void
     {
@@ -86,7 +82,9 @@ class AsanaApiClient
         }
     }
 
-    //new events online
+    /**
+     * Create cards on the boards in env var ASANA_NEW_EVENT_ONLINE.
+     */
     public function createCardsEventOnline(array $values): void
     {
         $boards = explode(',', $this->options['asana_new_event_online']);
@@ -95,7 +93,9 @@ class AsanaApiClient
         }
     }
 
-    //last minute events
+    /**
+     * Create cards on the boards in env var ASANA_LAST_MINUTE, and prefix the card name with "Last Minute ".
+     */
     public function createCardLastMinute(array $values): void
     {
         $title = 'Last Minute: '.$values['titel'];
@@ -105,7 +105,9 @@ class AsanaApiClient
         }
     }
 
-    //few events online
+    /**
+     * Create cards on the boards in env var ASANA_FEW_TICKETS, and prefix the card name with "Få billetter ".
+     */
     public function createCartFewTickets(array $values): void
     {
         $title = 'Få billetter: '.$values['titel'];
@@ -115,7 +117,14 @@ class AsanaApiClient
         }
     }
 
-    //Create card in Asana
+    //Create the card in Asana
+
+    /**
+     * Creates card in asana using the ids for customfields put in the env.
+     *
+     * @param projectID id of the board the card should be created on
+     * @param values array containing information about the event created
+     */
     public function createCard(string $projectId, array $values): void
     {
         $publicationDate = '';
@@ -144,12 +153,10 @@ class AsanaApiClient
                 'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],
                 'custom_fields'.'['.$this->options['yesplan_genre'].']' => $values['genre'],
                 'custom_fields'.'['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
-
                 'custom_fields'.'['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
                 'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
                 'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
                 'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
-
                 'projects' => $projectId,
             ],
         ];
@@ -158,8 +165,8 @@ class AsanaApiClient
         $response = $this->post($url, $options);
 
         if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
-            //   $this->mailer->sendEmail('lilosti@aarhus.dk', 'Error creating card', 'Error ' . $response->getStatusCode() . 'URL: ' . $url . 'projectID: ' . $projectId);
-            print_r($options);
+            $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
+            // print_r($options);
             $this->logger->error('Card not created statuscode yesplan_id: '.$response->getStatusCode().' '.$response->getContent(false).' '.$values['id']);
         } else {
             $this->logger->debug('Card created yesplan_id: '.$this->options['yesplan_id'].'___'.$values['id']);
