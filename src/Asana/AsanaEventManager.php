@@ -36,27 +36,27 @@ class AsanaEventManager
 
         foreach ($lastMinutEvents as $lastMinuteEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
-            $this->asanaApiClient->createCardLastMinute($eventData['titel'], $lastMinuteEvent['id'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
+            $this->asanaApiClient->createCardLastMinute($eventData);
             $this->cardCreated($lastMinuteEvent['id'], 'LastMinute');
         }
 
 
         foreach ($fewTicketEvents as $fewTicketEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($fewTicketEvent['id']));
-            $this->asanaApiClient->createCartFewTickets($eventData['titel'], $fewTicketEvent['id'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
+            $this->asanaApiClient->createCartFewTickets($eventData);
             $this->cardCreated($fewTicketEvent['id'], 'FewTickets');
         }
         
 
         foreach ($eventsOnlineEvents as $eventsOnlineEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($eventsOnlineEvent['id']));
-            $this->asanaApiClient->createCardsEventOnline($eventData['titel'], $eventsOnlineEvent['id'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
+            $this->asanaApiClient->createCardsEventOnline($eventData);
             $this->cardCreated($eventsOnlineEvent['id'], 'EventsOnline');
         }
 
         foreach ($eventsNewEvents as $eventsNewEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($eventsNewEvent['id']));
-            $this->asanaApiClient->createCardNewEventsBoard($eventData['titel'], $eventsNewEvent['id'], $eventData['eventdate'], $eventData['location'], $eventData['genre'], $eventData['marketingBudget'], $eventData['publicationdate'], $eventData['presaleDate'], $eventData['insaleDate']);
+            $this->asanaApiClient->createCardNewEventsBoard($eventData);
             $this->cardCreated($eventsNewEvent['id'], 'Events');
         }
         
@@ -66,14 +66,16 @@ class AsanaEventManager
     {
 
         $eventArray = [
+            'id' => $event->getId(),
             'titel' => $event->getTitle(),
-            'eventdate' => $event->getEventDate(),
+            'eventdate' => $event->getEventDate(),//->format('Y-m-d H:i:s'),
             'location' => $event->getLocation(),
             'genre' => $event->getGenre(),
             'marketingBudget' => $event->getMarketingBudget(),
             'publicationdate' => $event->getPublicationDate(),
             'presaleDate' => $event->getPresaleDate(),
-            'insaleDate' => $event->getInSaleDate()
+            'insaleDate' => $event->getInSaleDate(),
+            'percent' => $event->getCapacityPercent()
         ];
 
 

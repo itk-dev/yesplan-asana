@@ -2,14 +2,11 @@
 
 namespace App\Yesplan;
 
-use App\Controller\Logger as ControllerLogger;
 use App\Entity\YesplanEvent;
 use App\Repository\YesplanEventRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Decimal\Decimal;
-
-use Monolog\Logger as MonologLogger;
+use Psr\Log\LoggerInterface;
 
 class EventManager
 {
@@ -18,12 +15,13 @@ class EventManager
     private $entityManager;
     private $logger;
 
-    public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager, MonologLogger $loggerController)
+
+    public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->apiClient = $apiClient;
         $this->eventRepository = $eventRepository;
         $this->entityManager = $entityManager;
-        $this->logger = $loggerController;
+        $this->logger = $logger;
     }
 
     public function updateEvents(): void
@@ -112,6 +110,7 @@ class EventManager
 
     public function deleteOldEvents(): void
     {
+       
         $this->logger->info('Deleting events');
 
         $events = $this->eventRepository->findOldEvents();

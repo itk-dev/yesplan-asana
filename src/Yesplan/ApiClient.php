@@ -6,6 +6,8 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Psr\Log\LoggerInterface;
+use App\Controller\MailerController;
 
 use Monolog\Logger as MonologLogger;
 
@@ -15,13 +17,14 @@ class ApiClient
     private $options;
     private $eventArray;
     private $logger;
+    private $mailer;
 
     /** @var HttpClientInterface */
     private $httpClient;
 
     
 
-    public function __construct(array $yesplanApiClientOptions, MonologLogger $logger)
+    public function __construct(array $yesplanApiClientOptions, LoggerInterface $logger, MailerController $mailer)
     {
 
         $resolver = new OptionsResolver();
@@ -33,6 +36,7 @@ class ApiClient
 
         $this->eventArray = array();
         $this->logger = $logger;
+        $this->mailer = $mailer;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -114,6 +118,7 @@ class ApiClient
             } else if ($response->getStatusCode() === Response::HTTP_TOO_MANY_REQUESTS) {
                 sleep(6);
             } else { 
+                $this->mailer->sendEmail('lilosti@aarhus.dk','Error getting data','Error ' . $response->getStatusCode() . 'URL: ' . $url);
                 $this->logger->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
             }
         }
@@ -226,6 +231,7 @@ class ApiClient
             sleep(6);
             $this->getCustomData($id);
         } else {
+            $this->mailer->sendEmail('lilosti@aarhus.dk','Error getting customdata','Error ' . $customDataResponse->getStatusCode() . 'URL: ' . $customDataUrl . 'ID: ' . $id);
             $this->logger->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $id, 'url' => $customDataUrl]);
         }
     }
