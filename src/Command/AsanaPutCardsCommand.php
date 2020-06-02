@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of itk-dev/yesplan-asana.
+ *
+ * (c) 2020 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Command;
 
 use App\Asana\AsanaEventManager;

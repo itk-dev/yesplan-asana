@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of itk-dev/yesplan-asana.
+ *
+ * (c) 2020 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Yesplan;
 
 use App\Entity\YesplanEvent;
@@ -15,7 +23,6 @@ class EventManager
     private $entityManager;
     private $logger;
 
-
     public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->apiClient = $apiClient;
@@ -27,7 +34,7 @@ class EventManager
     public function updateEvents(): void
     {
         $this->logger->info('update events');
-        
+
         $events = $this->apiClient->getEvents();
         //   echo 'updateEvents() count: ' . count($events);
         foreach ($events as $data) {
@@ -47,11 +54,11 @@ class EventManager
 
             $event->setLocation($data['location']);
 
-            $event->setTicketCapacity(intval($data['capacity']));
-            $event->setTicketsAllocated(intval($data['allocated']));
-            $event->setTicketsBlocked(intval($data['blocked']));
-            $event->setTicketsReserved(intval($data['ticketsreserved']));
-            $event->setTicketsAvailable(intval($data['ticketsavailable']));
+            $event->setTicketCapacity((int) ($data['capacity']));
+            $event->setTicketsAllocated((int) ($data['allocated']));
+            $event->setTicketsBlocked((int) ($data['blocked']));
+            $event->setTicketsReserved((int) ($data['ticketsreserved']));
+            $event->setTicketsAvailable((int) ($data['ticketsavailable']));
 
             $event->setProductionOnline($data['productiononline']);
             $event->setEventOnline($data['eventonline']);
@@ -92,7 +99,6 @@ class EventManager
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['eventDate'])) {
-
                 $eventDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['eventDate']);
                 //2029-06-18T13:00:00+02:00
                 //  echo 'trnsaformed' . $eventDate . '.' .  $data['eventDate'];
@@ -110,14 +116,13 @@ class EventManager
 
     public function deleteOldEvents(): void
     {
-       
         $this->logger->info('Deleting events');
 
         $events = $this->eventRepository->findOldEvents();
 
         foreach ($events as $event) {
             $this->entityManager->remove($event);
-          //  print_r($event->getId());
+            //  print_r($event->getId());
         }
         $this->entityManager->flush();
     }

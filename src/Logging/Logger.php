@@ -1,9 +1,15 @@
 <?php
 
+/*
+ * This file is part of itk-dev/yesplan-asana.
+ *
+ * (c) 2020 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Psr\Log\LoggerInterface;
 
 class Logger
@@ -19,13 +25,14 @@ class Logger
     {
         $this->logger->info($message);
     }
+
     public function logDebug(string $message): void
     {
         $this->logger->debug($message);
     }
+
     public function logError(string $message): void
     {
         $this->logger->error($message);
     }
-
 }

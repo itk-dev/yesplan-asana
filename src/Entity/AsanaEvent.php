@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of itk-dev/yesplan-asana.
+ *
+ * (c) 2020 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -10,16 +18,15 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  */
 class AsanaEvent
 {
-     /*
-     * Hook timestampable behavior
-     * updates createdAt, updatedAt fields
-     */
+    /*
+    * Hook timestampable behavior
+    * updates createdAt, updatedAt fields
+    */
     use TimestampableEntity;
     /**
      * @ORM\Id()
      * @ORM\Column(type="string", length=255)
      */
-    
     private $id;
 
     /**

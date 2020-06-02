@@ -1,15 +1,21 @@
 <?php
 
+/*
+ * This file is part of itk-dev/yesplan-asana.
+ *
+ * (c) 2020 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Asana;
 
-use Symfony\Component\HttpClient\CurlHttpClient;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 use App\Controller\MailerController;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AsanaApiClient
 {
@@ -23,7 +29,6 @@ class AsanaApiClient
 
     public function __construct(array $asanaApiClientOptions, MailerController $mailer, LoggerInterface $logger)
     {
-
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
 
@@ -33,19 +38,18 @@ class AsanaApiClient
 
         $bearer = $this->options['bearer'];
 
-        $this->httpClient = HttpClient::create(['headers' => ['Authorization' => 'Bearer ' . $bearer]]);
-
+        $this->httpClient = HttpClient::create(['headers' => ['Authorization' => 'Bearer '.$bearer]]);
 
         //   $this->asanaEventManager = $asanaEventManagers;
 
         // $this->httpClient = HttpClient::create(['base_uri' => $this->options['url']]);
-
-
     }
+
     public function post(string $path, array $options): ResponseInterface
     {
-        return $this->request("POST", $path, $options);
+        return $this->request('POST', $path, $options);
     }
+
     protected function request(string $method, string $path, array $options): ResponseInterface
     {
         //  print_r($options);
@@ -69,8 +73,7 @@ class AsanaApiClient
             'yesplan_publicationDate',
             'yesplan_presaleDate',
             'yesplan_insaleDate',
-            'yesplan_percent'
-
+            'yesplan_percent',
         ]);
     }
 
@@ -79,34 +82,33 @@ class AsanaApiClient
     {
         $boards = explode(',', $this->options['asana_new_event']);
         foreach ($boards as $board) {
-            $this->createCard($board,  $values);
+            $this->createCard($board, $values);
         }
     }
 
     //new events online
     public function createCardsEventOnline(array $values): void
     {
-
         $boards = explode(',', $this->options['asana_new_event_online']);
         foreach ($boards as $board) {
-            $this->createCard($board,  $values);
+            $this->createCard($board, $values);
         }
     }
 
     //last minute events
     public function createCardLastMinute(array $values): void
     {
-        $title = 'Last Minute: ' . $values['titel'];
+        $title = 'Last Minute: '.$values['titel'];
         $boards = explode(',', $this->options['asana_last_minute']);
         foreach ($boards as $board) {
-            $this->createCard($board,  $values);
+            $this->createCard($board, $values);
         }
     }
 
     //few events online
     public function createCartFewTickets(array $values): void
     {
-        $title = 'Få billetter: ' . $values['titel'];
+        $title = 'Få billetter: '.$values['titel'];
         $boards = explode(',', $this->options['asana_few_tickets']);
         foreach ($boards as $board) {
             $this->createCard($board, $values);
@@ -120,16 +122,16 @@ class AsanaApiClient
         $eventDate = '';
         $presaleDate = '';
         $insaleDate = '';
-        if(!empty($values['publicationdate'])){
+        if (!empty($values['publicationdate'])) {
             $publicationDate = $values['publicationdate']->format('Y-m-d H:i:s');
         }
-        if(!empty($values['eventdate'])){
+        if (!empty($values['eventdate'])) {
             $eventDate = $values['eventdate']->format('Y-m-d H:i:s');
         }
-        if(!empty($values['presaleDate'])){
+        if (!empty($values['presaleDate'])) {
             $presaleDate = $values['presaleDate']->format('Y-m-d H:i:s');
         }
-        if(!empty($values['insaleDate'])){
+        if (!empty($values['insaleDate'])) {
             $insaleDate = $values['insaleDate']->format('Y-m-d H:i:s');
         }
 
@@ -137,34 +139,30 @@ class AsanaApiClient
         $options = [
             'body' => [
                 'name' => $values['titel'],
-                'custom_fields' . '[' . $this->options['yesplan_id'] . ']' => $values['id'],
-                'custom_fields' . '[' . $this->options['yesplan_eventDate'] . ']' => $eventDate,
-                'custom_fields' . '[' . $this->options['yesplan_location'] . ']' => $values['location'],
-                'custom_fields' . '[' . $this->options['yesplan_genre'] . ']'=> $values['genre'],
-                'custom_fields' . '[' . $this->options['yesplan_marketingBudget'] . ']' => $values['marketingBudget'],
-   
-                'custom_fields' . '[' . $this->options['yesplan_publicationDate'] . ']' => $publicationDate,
-                'custom_fields' . '[' . $this->options['yesplan_presaleDate'] . ']' => $presaleDate,
-                'custom_fields' . '[' . $this->options['yesplan_insaleDate'] . ']' => $insaleDate,
-                'custom_fields' . '[' . $this->options['yesplan_percent'] . ']' => $values['percent'],
+                'custom_fields'.'['.$this->options['yesplan_id'].']' => $values['id'],
+                'custom_fields'.'['.$this->options['yesplan_eventDate'].']' => $eventDate,
+                'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],
+                'custom_fields'.'['.$this->options['yesplan_genre'].']' => $values['genre'],
+                'custom_fields'.'['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
 
-                'projects' => $projectId
-            ]
+                'custom_fields'.'['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
+                'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
+                'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
+                'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
+
+                'projects' => $projectId,
+            ],
         ];
 
-          // print_r($values['eventdate']->format('Y-m-d H:i:s'));
-        $response =  $this->post($url, $options);
+        // print_r($values['eventdate']->format('Y-m-d H:i:s'));
+        $response = $this->post($url, $options);
 
-
-
-        
-        if (!($response->getStatusCode()  === Response::HTTP_CREATED)) {
-         //   $this->mailer->sendEmail('lilosti@aarhus.dk', 'Error creating card', 'Error ' . $response->getStatusCode() . 'URL: ' . $url . 'projectID: ' . $projectId);
-         print_r($options);   
-         $this->logger->error('Card not created statuscode yesplan_id: ' . $response->getStatusCode() . ' ' . $response->getContent(false)  . ' ' . $values['id']);
-        }else{
-            $this->logger->debug('Card created yesplan_id: ' . $this->options['yesplan_id'] . '___' . $values['id']);
-
+        if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
+            //   $this->mailer->sendEmail('lilosti@aarhus.dk', 'Error creating card', 'Error ' . $response->getStatusCode() . 'URL: ' . $url . 'projectID: ' . $projectId);
+            print_r($options);
+            $this->logger->error('Card not created statuscode yesplan_id: '.$response->getStatusCode().' '.$response->getContent(false).' '.$values['id']);
+        } else {
+            $this->logger->debug('Card created yesplan_id: '.$this->options['yesplan_id'].'___'.$values['id']);
         }
     }
 }

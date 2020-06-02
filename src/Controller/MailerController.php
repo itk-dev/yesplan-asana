@@ -1,4 +1,13 @@
 <?php
+
+/*
+ * This file is part of itk-dev/yesplan-asana.
+ *
+ * (c) 2020 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -8,12 +17,11 @@ use Symfony\Component\Mime\Email;
 class MailerController extends AbstractController
 {
     private $mailer;
+
     public function __construct(MailerInterface $mailer)
     {
         $this->mailer = $mailer;
     }
-
-   
 
     public function sendEmail(string $to, string $subject, string $message)
     {

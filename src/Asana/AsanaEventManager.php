@@ -1,14 +1,20 @@
 <?php
 
+/*
+ * This file is part of itk-dev/yesplan-asana.
+ *
+ * (c) 2020 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Asana;
 
-use App\Entity\YesplanEvent;
-use App\Repository\YesplanEventRepository;
-use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Asana\AsanaApiClient;
 use App\Entity\AsanaEvent;
+use App\Entity\YesplanEvent;
 use App\Repository\AsanaEventRepository;
+use App\Repository\YesplanEventRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class AsanaEventManager
 {
@@ -25,8 +31,6 @@ class AsanaEventManager
         $this->asanaEventRepository = $asanaEventRepository;
     }
 
-
-
     public function createCards(): void
     {
         $lastMinutEvents = $this->eventRepository->findLastMinutTickets();
@@ -40,13 +44,11 @@ class AsanaEventManager
             $this->cardCreated($lastMinuteEvent['id'], 'LastMinute');
         }
 
-
         foreach ($fewTicketEvents as $fewTicketEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($fewTicketEvent['id']));
             $this->asanaApiClient->createCartFewTickets($eventData);
             $this->cardCreated($fewTicketEvent['id'], 'FewTickets');
         }
-        
 
         foreach ($eventsOnlineEvents as $eventsOnlineEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($eventsOnlineEvent['id']));
@@ -59,29 +61,26 @@ class AsanaEventManager
             $this->asanaApiClient->createCardNewEventsBoard($eventData);
             $this->cardCreated($eventsNewEvent['id'], 'Events');
         }
-        
     }
 
     private function getEventData(YesplanEvent $event): array
     {
-
         $eventArray = [
             'id' => $event->getId(),
             'titel' => $event->getTitle(),
-            'eventdate' => $event->getEventDate(),//->format('Y-m-d H:i:s'),
+            'eventdate' => $event->getEventDate(), //->format('Y-m-d H:i:s'),
             'location' => $event->getLocation(),
             'genre' => $event->getGenre(),
             'marketingBudget' => $event->getMarketingBudget(),
             'publicationdate' => $event->getPublicationDate(),
             'presaleDate' => $event->getPresaleDate(),
             'insaleDate' => $event->getInSaleDate(),
-            'percent' => $event->getCapacityPercent()
+            'percent' => $event->getCapacityPercent(),
         ];
-
-
 
         return $eventArray;
     }
+
     private function cardCreated(string $id, string $type)
     {
         $card = $this->asanaEventRepository->find($id);
