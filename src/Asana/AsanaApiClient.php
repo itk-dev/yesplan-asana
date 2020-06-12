@@ -33,10 +33,6 @@ class AsanaApiClient
         $this->options = $resolver->resolve($asanaApiClientOptions);
         $this->mailer = $mailer;
         $this->logger = $logger;
-
-        $bearer = $this->options['bearer'];
-
-        $this->httpClient = HttpClient::create(['headers' => ['Authorization' => 'Bearer '.$bearer]]);
     }
 
     public function post(string $path, array $options): ResponseInterface
@@ -46,6 +42,10 @@ class AsanaApiClient
 
     protected function request(string $method, string $path, array $options): ResponseInterface
     {
+        if (null === $this->httpClient) {
+            $this->httpClient = HttpClient::create(['headers' => ['Authorization' => 'Bearer '.$this->options['bearer']]]);
+        }
+
         return $this->httpClient->request($method, $path, $options);
     }
 
