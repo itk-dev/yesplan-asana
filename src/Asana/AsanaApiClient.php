@@ -99,7 +99,6 @@ class AsanaApiClient
      */
     public function createCardLastMinute(array $values): void
     {
-        $title = 'Last Minute: '.$values['titel'];
         $boards = explode(',', $this->options['asana_last_minute']);
         foreach ($boards as $board) {
             $this->createCard($board, $values);
