@@ -124,22 +124,10 @@ class AsanaApiClient
      */
     public function createCard(string $projectId, array $values): void
     {
-        $publicationDate = '';
-        $eventDate = '';
-        $presaleDate = '';
-        $insaleDate = '';
-        if (!empty($values['publicationdate'])) {
-            $publicationDate = $values['publicationdate']->format('Y-m-d H:i:s');
-        }
-        if (!empty($values['eventdate'])) {
-            $eventDate = $values['eventdate']->format('Y-m-d H:i:s');
-        }
-        if (!empty($values['presaleDate'])) {
-            $presaleDate = $values['presaleDate']->format('Y-m-d H:i:s');
-        }
-        if (!empty($values['insaleDate'])) {
-            $insaleDate = $values['insaleDate']->format('Y-m-d H:i:s');
-        }
+        $publicationDate = !empty($values['publicationdate']) ? $values['publicationdate']->format('Y-m-d H:i:s') : '';
+        $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format('Y-m-d H:i:s') : '';
+        $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format('Y-m-d H:i:s') : '';
+        $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format('Y-m-d H:i:s') : '';
 
         $url = $this->options['asana_url'];
         $options = [
