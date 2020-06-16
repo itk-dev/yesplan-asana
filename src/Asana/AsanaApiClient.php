@@ -16,6 +16,8 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Component\OptionsResolver\Options;
+
 
 class AsanaApiClient
 {
@@ -73,11 +75,10 @@ class AsanaApiClient
     /**
      * Create cards on the boards in env var ASANA_NEW_EVENT.
      */
-    //new events
     public function createCardNewEventsBoard(array $values): void
     {
         $boards = explode(',', $this->options['asana_new_event']);
-        foreach ($boards as $board) {
+        foreach ($this->options['asana_new_event'] as $board) {
             $this->createCard($board, $values);
         }
     }
@@ -116,8 +117,6 @@ class AsanaApiClient
             $this->createCard($board, $values);
         }
     }
-
-    //Create the card in Asana
 
     /**
      * Creates card in asana using the ids for customfields put in the env.
@@ -161,11 +160,10 @@ class AsanaApiClient
             ],
         ];
 
-        // print_r($values['eventdate']->format('Y-m-d H:i:s'));
         $response = $this->post($url, $options);
 
         if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
-            $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
+     //       $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
             // print_r($options);
             $this->logger->error('Card not created statuscode yesplan_id: '.$response->getStatusCode().' '.$response->getContent(false).' '.$values['id']);
         } else {
