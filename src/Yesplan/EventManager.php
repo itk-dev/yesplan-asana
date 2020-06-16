@@ -65,13 +65,13 @@ class EventManager
             $event->setProductionOnline($data['productiononline']);
             $event->setEventOnline($data['eventonline']);
 
-            $calculateCapacityPercentage = 0;
+            $capacityPercentage = 0;
 
             //(tixintegrations_ticketsavailable + tixintegrations_ticketsreserved) / (tixintegrations_capacity - tixintegrations_blocked - tixintegrations_allocated) * 100
             if ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated() > 0) {
-                $calculateCapacityPercentage = ($event->getTicketsAvailable() + $event->getTicketsReserved()) / ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated()) * 100;
+                $capacityPercentage = ($event->getTicketsAvailable() + $event->getTicketsReserved()) / ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated()) * 100;
             }
-            $event->setCapacityPercent($calculateCapacityPercentage);
+            $event->setCapacityPercent($capacityPercentage);
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['publication_date'])) {
