@@ -77,7 +77,7 @@ class AsanaEventManager
         $eventArray = [
             'id' => $event->getId(),
             'titel' => $event->getTitle(),
-            'eventdate' => $event->getEventDate(), //->format('Y-m-d H:i:s'),
+            'eventdate' => $event->getEventDate(),
             'location' => $event->getLocation(),
             'genre' => $event->getGenre(),
             'marketingBudget' => $event->getMarketingBudget(),
