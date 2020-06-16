@@ -18,6 +18,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class AsanaEventManager
 {
+    private const LAST_MINUTE = 'LastMinute';
+    private const FEW_TICKETS = 'FewTickets';
+    private const EVENTS_ONLINE = 'EventsOnline';
+    private const EVENTS = 'Events';
     private $asanaApiClient;
     private $eventRepository;
     private $entityManager;
@@ -104,16 +108,16 @@ class AsanaEventManager
             $card->setId($id);
         }
         switch ($type) {
-            case 'LastMinute':
+            case self::LAST_MINUTE:
                 $card->setCreatedInLastMinute(true);
                 break;
-            case 'FewTickets':
+            case self::LAST_MINUTE:
                 $card->setCreatedInFewTickets(true);
                 break;
-            case 'EventsOnline':
+            case self::EVENTS_ONLINE:
                 $card->setCreatedInNewEventsOnline(true);
                 break;
-            case 'Events':
+            case self::EVENTS:
                 $card->setCreatedInNewEvents(true);
                 break;
         }
