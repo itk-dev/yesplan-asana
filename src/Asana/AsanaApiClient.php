@@ -111,7 +111,6 @@ class AsanaApiClient
      */
     public function createCartFewTickets(array $values): void
     {
-        $title = 'Få billetter: '.$values['titel'];
         $boards = explode(',', $this->options['asana_few_tickets']);
         foreach ($boards as $board) {
             $this->createCard($board, $values);
