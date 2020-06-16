@@ -150,11 +150,11 @@ class AsanaApiClient
         $response = $this->post($url, $options);
 
         if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
-     //       $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-            // print_r($options);
-            $this->logger->error('Card not created statuscode yesplan_id: '.$response->getStatusCode().' '.$response->getContent(false).' '.$values['id']);
+            $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
+            $this->logger->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
+
         } else {
-            $this->logger->debug('Card created yesplan_id: '.$this->options['yesplan_id'].'___'.$values['id']);
+            $this->logger->debug('Card created yesplan_id: ', ['yesplan_id' => $this->options['yesplan_id']]);
         }
     }
 }
