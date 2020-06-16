@@ -26,6 +26,7 @@ class AsanaApiClient
     private $logger;
     /** @var HttpClientInterface */
     private $httpClient;
+    private const DATETIME_FORMAT = 'Y-m-d H:i:s';
 
     public function __construct(array $asanaApiClientOptions, MailerController $mailer, LoggerInterface $logger)
     {
@@ -124,10 +125,10 @@ class AsanaApiClient
      */
     public function createCard(string $projectId, array $values): void
     {
-        $publicationDate = !empty($values['publicationdate']) ? $values['publicationdate']->format('Y-m-d H:i:s') : '';
-        $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format('Y-m-d H:i:s') : '';
-        $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format('Y-m-d H:i:s') : '';
-        $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format('Y-m-d H:i:s') : '';
+        $publicationDate = !empty($values['publicationdate']) ? $values['publicationdate']->format(self::DATETIME_FORMAT) : '';
+        $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::DATETIME_FORMAT) : '';
+        $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format(self::DATETIME_FORMAT) : '';
+        $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format(self::DATETIME_FORMAT) : '';
 
         $url = $this->options['asana_url'];
         $options = [
