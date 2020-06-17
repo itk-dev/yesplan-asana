@@ -31,11 +31,7 @@ class ApiClient
     {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
-
         $this->options = $resolver->resolve($yesplanApiClientOptions);
-
-        $this->httpClient = HttpClient::create(['base_uri' => $this->options['url']]);
-
         $this->eventArray = [];
         $this->logger = $logger;
         $this->mailer = $mailer;
@@ -59,6 +55,7 @@ class ApiClient
 
     protected function request(string $method, string $path, array $options): ResponseInterface
     {
+        $this->httpClient = HttpClient::create(['base_uri' => $this->options['url']]);
         return $this->httpClient->request($method, $path, $options);
     }
 
@@ -69,25 +66,19 @@ class ApiClient
     {
         $this->logger->info('Get events running');
 
-        //$client = HttpClient::create(['base_uri' => $this->options['url']]);
-
-        $timeNow = new DateTime('NOW');
-        $time10Years = new DateTime('NOW');
-
-        $time10Years->add(new DateInterval('P10Y'));
-        //$timeNow->format('Y-m-d H:i:s:')
+        $timeNow = new DateTime();
+        $time10Years = (new DateTime())->add(new DateInterval('P10Y'));
+        
         $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$time10Years->format('d-m-Y');
 
-        $url = 'api/events/event%3Adate%3A'.$dateString;
+        $url = urlencode('api/events/event%3Adate%3A'.$dateString);
         while (null !== $url) {
             $response = $this->get($url, ['query' => ['api_key' => $this->options['apikey']]]);
 
-            if (Response::HTTP_OK === $response->getStatusCode()) { //http statuskode ok
-                $responseJson = json_decode($response->getContent(), true);
-                $id = '';
-                $responseArray = $response->toArray();
+            if (Response::HTTP_OK === $response->getStatusCode()) {
+                $result = $response->toArray();
 
-                foreach ($responseArray['data'] as $data) {
+                foreach ($result['data'] as $data) {
                     if (!empty($data['id'])) {
                         $id = $data['id'];
                         $this->eventArray[$id]['id'] = $id;
@@ -118,8 +109,8 @@ class ApiClient
                         $this->getCustomData($id);
                     }
                 }
-                if (!empty($responseArray['pagination']['next'])) {
-                    $url = $responseArray['pagination']['next'];
+                if (!empty($result['pagination']['next'])) {
+                    $url = $result['pagination']['next'];
                 } else {
                     $url = null;
                 }
@@ -146,9 +137,9 @@ class ApiClient
 
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
-            $customDataResponseArray = $customDataResponse->toArray();
+            $customDataresult = $customDataResponse->toArray();
 
-            foreach ($customDataResponseArray['groups'] as $group) {
+            foreach ($customDataresult['groups'] as $group) {
                 //Offentliggørelses dato
                 //I salg dato
                 //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
