@@ -47,23 +47,19 @@ class EventManager
                 $event->setId($eventid);
             }
 
-            $event->setData($data);
-            $event->setTitle($data['title']);
-
-            $event->setMarketingBudget($data['marketing_budget']);
-
-            $event->setGenre($data['genre']);
-
-            $event->setLocation($data['location']);
-
-            $event->setTicketCapacity((int) ($data['capacity']));
-            $event->setTicketsAllocated((int) ($data['allocated']));
-            $event->setTicketsBlocked((int) ($data['blocked']));
-            $event->setTicketsReserved((int) ($data['ticketsreserved']));
-            $event->setTicketsAvailable((int) ($data['ticketsavailable']));
-
-            $event->setProductionOnline($data['productiononline']);
-            $event->setEventOnline($data['eventonline']);
+            $event
+                ->setData($data)
+                ->setTitle($data['title'])
+                ->setMarketingBudget($data['marketing_budget'])
+                ->setGenre($data['genre'])
+                ->setLocation($data['location'])
+                ->setTicketCapacity((int) $data['capacity'])
+                ->setTicketsAllocated((int) $data['allocated'])
+                ->setTicketsBlocked((int) $data['blocked'])
+                ->setTicketsReserved((int) $data['ticketsreserved'])
+                ->setTicketsAvailable((int) $data['ticketsavailable'])
+                ->setProductionOnline($data['productiononline'])
+                ->setEventOnline($data['eventonline']);
 
             $capacityPercentage = 0;
 
@@ -75,42 +71,22 @@ class EventManager
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['publication_date'])) {
-                $publicationDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['publication_date']);
-                //dont add date if conversion fails - should be logged
-                if ($publicationDate) {
-                    $event->setPublicationDate($publicationDate);
-                }
+                $event->setPublicationDate($this->getDateTime($data['publication_date']));
             }
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['presale_date'])) {
-                $presaleDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['presale_date']);
-                //dont add date if conversion fails - should be logged
-                if ($presaleDate) {
-                    $event->setPresaleDate($presaleDate);
-                }
+                $event->setPresaleDate($this->getDateTime($data['presale_date']));
             }
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['ticketinfo_sale'])) {
-                $saleDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['ticketinfo_sale']);
-                //dont add date if conversion fails - should be logged
-                if ($saleDate) {
-                    $event->setInSaleDate($saleDate);
-                }
+                $event->setInSaleDate($this->getDateTime($data['ticketinfo_sale']));
             }
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['eventDate'])) {
-                $eventDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['eventDate']);
-                //2029-06-18T13:00:00+02:00
-                //  echo 'trnsaformed' . $eventDate . '.' .  $data['eventDate'];
-                //dont add date if conversion fails - should be logged
-                if ($eventDate) {
-                    $event->setEventDate($eventDate);
-                }
+                $event->setEventDate($this->getDateTime($data['eventDate']));
             }
-            // $event->setEventDate(DateTime::createFromFormat('Y-m-d\TH:i',$data['eventDate']));
-
             $this->entityManager->persist($event);
         }
         $this->entityManager->flush();
@@ -127,8 +103,20 @@ class EventManager
 
         foreach ($events as $event) {
             $this->entityManager->remove($event);
-            //  print_r($event->getId());
         }
         $this->entityManager->flush();
+    }
+    /** 
+     * Get datetime from string - log conversion errors
+     */
+    private function getDateTime(string $dateTimeString): DateTime
+    {
+        $dateTime = DateTime::createFromFormat('Y-m-d\TG:i:se', $dateTimeString);
+        if (!$dateTime) {
+            $this->logger->error('DateConversion failed {date}', ['date' => $dateTimeString]);
+            $dateTime = '';
+        }
+
+        return $dateTime;
     }
 }
