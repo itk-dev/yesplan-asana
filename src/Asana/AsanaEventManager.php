@@ -51,25 +51,25 @@ class AsanaEventManager
         foreach ($lastMinutEvents as $lastMinuteEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
             $this->asanaApiClient->createCardLastMinute($eventData);
-            $this->cardCreated($lastMinuteEvent['id'], 'LastMinute');
+            $this->cardCreated($lastMinuteEvent['id'], self::LAST_MINUTE);
         }
 
         foreach ($fewTicketEvents as $fewTicketEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($fewTicketEvent['id']));
             $this->asanaApiClient->createCartFewTickets($eventData);
-            $this->cardCreated($fewTicketEvent['id'], 'FewTickets');
+            $this->cardCreated($fewTicketEvent['id'], self::FEW_TICKETS);
         }
 
         foreach ($eventsOnlineEvents as $eventsOnlineEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($eventsOnlineEvent['id']));
             $this->asanaApiClient->createCardsEventOnline($eventData);
-            $this->cardCreated($eventsOnlineEvent['id'], 'EventsOnline');
+            $this->cardCreated($eventsOnlineEvent['id'], self::EVENTS_ONLINE);
         }
 
         foreach ($eventsNewEvents as $eventsNewEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($eventsNewEvent['id']));
             $this->asanaApiClient->createCardNewEventsBoard($eventData);
-            $this->cardCreated($eventsNewEvent['id'], 'Events');
+            $this->cardCreated($eventsNewEvent['id'], self::EVENTS);
         }
     }
 
@@ -111,7 +111,7 @@ class AsanaEventManager
             case self::LAST_MINUTE:
                 $card->setCreatedInLastMinute(true);
                 break;
-            case self::LAST_MINUTE:
+            case self::FEW_TICKETS:
                 $card->setCreatedInFewTickets(true);
                 break;
             case self::EVENTS_ONLINE:
