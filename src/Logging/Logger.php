@@ -10,13 +10,13 @@
 
 namespace App\Controller;
 
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 
 class Logger
 {
     private $logger;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerTrait $logger)
     {
         $this->logger = $logger;
     }
