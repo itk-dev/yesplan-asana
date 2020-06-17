@@ -32,13 +32,11 @@ class YesplanDeleteOldEventsCommand extends Command
     {
         $this
             ->setDescription('Delete events with eventdate before today from local database')
-
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
         $this->eventManager->deleteOldEvents();
 
         return 0;
