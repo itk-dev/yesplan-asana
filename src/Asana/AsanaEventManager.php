@@ -78,7 +78,7 @@ class AsanaEventManager
      */
     private function getEventData(YesplanEvent $event): array
     {
-        $eventArray = [
+        $eventData = [
             'id' => $event->getId(),
             'titel' => $event->getTitle(),
             'eventdate' => $event->getEventDate(),
@@ -91,7 +91,7 @@ class AsanaEventManager
             'percent' => $event->getCapacityPercent(),
         ];
 
-        return $eventArray;
+        return $eventData;
     }
 
     /**
