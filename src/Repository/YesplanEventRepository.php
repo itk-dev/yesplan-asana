@@ -109,20 +109,8 @@ class YesplanEventRepository extends ServiceEntityRepository
             ';
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
-        //   print_r($stmt->fetchAll());
+
         return $stmt->fetchAll();
-
-        /*
-
-               $qb = $this->createQueryBuilder('p')
-               ->select('e')
-               ->from('App\Entity\YesplanEvent', 'e')
-               ->leftjoin('App\Entity\AsanaEvent','a', 'e.id = a.id' )
-               ->where('e.capacityPercent <= :capacityPercent AND a.createdInFewTickets <> true')
-               ->setParameters(['capacityPercent' => 10]);
-        */
-
-    //   return $qb->getQuery()->getResult();
     }
 
     /**
