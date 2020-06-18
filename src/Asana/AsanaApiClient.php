@@ -71,6 +71,22 @@ class AsanaApiClient
             'yesplan_insaleDate',
             'yesplan_percent',
         ]);
+        $resolver->setNormalizer('asana_new_event', function (Options $options, $value){
+            $value = explode(',', $value);
+            return $value;
+        });
+        $resolver->setNormalizer('asana_new_event_online', function (Options $options, $value){
+            $value = explode(',', $value);
+            return $value;
+        }); 
+        $resolver->setNormalizer('asana_last_minute', function (Options $options, $value){
+            $value = explode(',', $value);
+            return $value;
+        }); 
+        $resolver->setNormalizer('asana_few_tickets', function (Options $options, $value){
+            $value = explode(',', $value);
+            return $value;
+        }); 
     }
 
     /**
@@ -78,7 +94,6 @@ class AsanaApiClient
      */
     public function createCardNewEventsBoard(array $values): void
     {
-        $boards = explode(',', $this->options['asana_new_event']);
         foreach ($this->options['asana_new_event'] as $board) {
             $this->createCard($board, $values);
         }
@@ -89,8 +104,7 @@ class AsanaApiClient
      */
     public function createCardsEventOnline(array $values): void
     {
-        $boards = explode(',', $this->options['asana_new_event_online']);
-        foreach ($boards as $board) {
+        foreach ($this->options['asana_new_event'] as $board) {
             $this->createCard($board, $values);
         }
     }
@@ -100,8 +114,7 @@ class AsanaApiClient
      */
     public function createCardLastMinute(array $values): void
     {
-        $boards = explode(',', $this->options['asana_last_minute']);
-        foreach ($boards as $board) {
+        foreach ($this->options['asana_last_minute'] as $board) {
             $this->createCard($board, $values);
         }
     }
@@ -111,8 +124,7 @@ class AsanaApiClient
      */
     public function createCartFewTickets(array $values): void
     {
-        $boards = explode(',', $this->options['asana_few_tickets']);
-        foreach ($boards as $board) {
+        foreach ($this->options['asana_few_tickets'] as $board) {
             $this->createCard($board, $values);
         }
     }
