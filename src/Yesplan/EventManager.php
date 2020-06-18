@@ -39,6 +39,7 @@ class EventManager
         $this->logger->info('update events');
 
         $events = $this->apiClient->getEvents();
+        
         foreach ($events as $data) {
             $eventid = $data['id'];
             $event = $this->eventRepository->find($eventid);
@@ -71,7 +72,12 @@ class EventManager
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['publication_date'])) {
-                $event->setPublicationDate($this->getDateTime($data['publication_date']));
+                $publicationDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['publication_date']);
+                //dont add date if conversion fails - should be logged
+                if ($publicationDate) {
+                    $event->setPublicationDate($publicationDate);
+                }
+                 $event->setPresaleDate($this->getDateTime($data['presale_date']));
             }
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['presale_date'])) {
@@ -109,12 +115,12 @@ class EventManager
     /** 
      * Get datetime from string - log conversion errors
      */
-    private function getDateTime(string $dateTimeString): DateTime
+    private function getDateTime(string $dateTimeString)
     {
         $dateTime = DateTime::createFromFormat('Y-m-d\TG:i:se', $dateTimeString);
         if (!$dateTime) {
-            $this->logger->error('DateConversion failed {date}', ['date' => $dateTimeString]);
-            $dateTime = '';
+            $this->logger->error('DateConversion failed {date}', ['date' => $dateTimeString, 'formatError' => DateTime::getLastErrors()]);
+            $dateTime = null;
         }
 
         return $dateTime;
