@@ -22,7 +22,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class ApiClient
 {
     private $options;
-    private $eventArray;
     private $logger;
     private $mailer;
     private $httpClient;
@@ -32,7 +31,6 @@ class ApiClient
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         $this->options = $resolver->resolve($yesplanApiClientOptions);
-        $this->eventArray = [];
         $this->logger = $logger;
         $this->mailer = $mailer;
     }
@@ -65,13 +63,14 @@ class ApiClient
     public function getEvents(): array
     {
         $this->logger->info('Get events running');
+        $events = [];
 
         $timeNow = new DateTime();
         $time10Years = (new DateTime())->add(new DateInterval('P10Y'));
-        
-        $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$time10Years->format('d-m-Y');
 
-        $url = urlencode('api/events/event%3Adate%3A'.$dateString);
+        $dateString = $timeNow->format('d-m-Y') . '%20TO%20' . $time10Years->format('d-m-Y');
+
+        $url = 'api/events/event%3Adate%3A' . $dateString;
         while (null !== $url) {
             $response = $this->get($url, ['query' => ['api_key' => $this->options['apikey']]]);
 
@@ -81,32 +80,21 @@ class ApiClient
                 foreach ($result['data'] as $data) {
                     if (!empty($data['id'])) {
                         $id = $data['id'];
-                        $this->eventArray[$id]['id'] = $id;
-                        $this->eventArray[$id]['data'] = $data;
-                        $this->eventArray[$id]['title'] = $data['name'];
-                        $this->eventArray[$id]['marketing_budget'] = '';
-                        $this->eventArray[$id]['genre'] = '';
-                        $this->eventArray[$id]['publication_date'] = '';
-                        $this->eventArray[$id]['ticketinfo_sale'] = '';
-                        $this->eventArray[$id]['eventonline'] = '';
-                        $this->eventArray[$id]['productiononline'] = '';
-                        $this->eventArray[$id]['presale_date'] = '';
-                        $this->eventArray[$id]['location'] = '';
-                        $this->eventArray[$id]['ticketsavailable'] = '';
-                        $this->eventArray[$id]['ticketsreserved'] = '';
-                        $this->eventArray[$id]['capacity'] = '';
-                        $this->eventArray[$id]['blocked'] = '';
-                        $this->eventArray[$id]['allocated'] = '';
+                        $events[$id]['id'] = $id;
+                        $events[$id]['data'] = $data;
+                        $events[$id]['title'] = $data['name'];
+                        $events[$id]['location'] = '';
 
                         //if an event has multiple locations, this will only get the first
 
                         if (!empty($data['locations']['next'])) {
-                            $this->eventArray[$id]['location'] = $data['locations'][0]['name'];
+                            $events[$id]['location'] = $data['locations'][0]['name'];
                         }
 
-                        $this->eventArray[$id]['eventDate'] = $data['starttime'];
+                        $events[$id]['eventDate'] = $data['starttime'];
 
-                        $this->getCustomData($id);
+                        $events = array_merge_recursive($events, $this->getCustomData($id));
+                      //  $events = $this->getCustomData($id);
                     }
                 }
                 if (!empty($result['pagination']['next'])) {
@@ -118,12 +106,12 @@ class ApiClient
                 //if Yesplan receives to many requests, take a coffee break
                 sleep(6);
             } else {
-                $this->mailer->sendEmail('Error getting data', 'Error '.$response->getStatusCode().'URL: '.$url);
+                $this->mailer->sendEmail('Error getting data', 'Error ' . $response->getStatusCode() . 'URL: ' . $url);
                 $this->logger->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
             }
         }
 
-        return $this->eventArray;
+        return $events;
     }
 
     /**
@@ -131,25 +119,38 @@ class ApiClient
      *
      * @return YesplanEvent[]
      */
-    private function getCustomData(string $id): void
+    private function getCustomData(string $id): array
     {
-        $customDataUrl = 'api/event/'.$id.'/customdata';
+        $customData = [];
+        $customDataUrl = 'api/event/' . $id . '/customdata';
 
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
             $customDataresult = $customDataResponse->toArray();
 
             foreach ($customDataresult['groups'] as $group) {
+                $customData[$id]['marketing_budget'] = '';
+                $customData[$id]['genre'] = '';
+                $customData[$id]['publication_date'] = '';
+                $customData[$id]['ticketinfo_sale'] = '';
+                $customData[$id]['eventonline'] = '';
+                $customData[$id]['productiononline'] = '';
+                $customData[$id]['presale_date'] = '';
+                $customData[$id]['ticketsavailable'] = '';
+                $customData[$id]['ticketsreserved'] = '';
+                $customData[$id]['capacity'] = '';
+                $customData[$id]['blocked'] = '';
+                $customData[$id]['allocated'] = '';
+                
                 //Offentliggørelses dato
                 //I salg dato
                 //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
-
                 if ('tix' === $group['keyword']) {
                     foreach ($group['children'] as $tix) {
                         if ('tix_tixobligatoriskefelter' === $tix['keyword']) {
                             foreach ($tix['children'] as $ticketPublic) {
                                 if ('ticketinfo_public' === $ticketPublic['keyword']) {
-                                    $this->eventArray[$id]['publication_date'] = $ticketPublic['value'];
+                                    $customData[$id]['publication_date'] = $ticketPublic['value'];
                                 }
                             }
                         }
@@ -162,7 +163,7 @@ class ApiClient
                         if ('generelinformation_data' === $generelInformation['keyword']) {
                             foreach ($generelInformation['children'] as $information) {
                                 if ('eventinfo_web_categori' === $information['keyword']) {
-                                    $this->eventArray[$id]['genre'] = $information['value'][0];
+                                    $customData[$id]['genre'] = $information['value'][0];
                                 }
                             }
                         }
@@ -175,7 +176,7 @@ class ApiClient
                         if ('budgetudgifter_andreudgifterekstern' === $budgetExpenses['keyword']) {
                             foreach ($budgetExpenses['children'] as $externalExpenses) {
                                 if ('expences_marketing' === $externalExpenses['keyword']) {
-                                    $this->eventArray[$id]['marketing_budget'] = $externalExpenses['value'];
+                                    $customData[$id]['marketing_budget'] = $externalExpenses['value'];
                                 }
                             }
                         }
@@ -194,7 +195,7 @@ class ApiClient
                                     $this->eventArray[$id]['ticketinfo_sale'] = $ticketPublic['value'];
                                 }
                                 if ('publication_date' === $ticketPublic['keyword']) {
-                                    $this->eventArray[$id]['publication_date'] = $ticketPublic['value'];
+                                    $customData[$id]['publication_date'] = $ticketPublic['value'];
                                 }
                             }
                         }
@@ -202,25 +203,25 @@ class ApiClient
                         if ('tix_billetsalgtix' === $tix['keyword']) {
                             foreach ($tix['children'] as $billetsalg) {
                                 if ('tixintegrations_productiononline' === $billetsalg['keyword']) {
-                                    $this->eventArray[$id]['productiononline'] = $billetsalg['value'];
+                                    $customData[$id]['productiononline'] = $billetsalg['value'];
                                 }
                                 if ('tixintegrations_eventonline' === $billetsalg['keyword']) {
-                                    $this->eventArray[$id]['eventonline'] = $billetsalg['value'];
+                                    $customData[$id]['eventonline'] = $billetsalg['value'];
                                 }
                                 if ('tixintegration_ticketsavailable' === $billetsalg['keyword']) {
-                                    $this->eventArray[$id]['ticketsavailable'] = $billetsalg['value'];
+                                    $customData[$id]['ticketsavailable'] = $billetsalg['value'];
                                 }
                                 if ('tixintegration_ticketsreserved' === $billetsalg['keyword']) {
-                                    $this->eventArray[$id]['ticketsreserved'] = $billetsalg['value'];
+                                    $customData[$id]['ticketsreserved'] = $billetsalg['value'];
                                 }
                                 if ('tixintegrations_capacity' === $billetsalg['keyword']) {
-                                    $this->eventArray[$id]['capacity'] = $billetsalg['value'];
+                                    $customData[$id]['capacity'] = $billetsalg['value'];
                                 }
                                 if ('tixintegrations_blocked' === $billetsalg['keyword']) {
-                                    $this->eventArray[$id]['blocked'] = $billetsalg['value'];
+                                    $customData[$id]['blocked'] = $billetsalg['value'];
                                 }
                                 if ('tixintegrations_allocated' === $billetsalg['keyword']) {
-                                    $this->eventArray[$id]['allocated'] = $billetsalg['value'];
+                                    $customData[$id]['allocated'] = $billetsalg['value'];
                                 }
                             }
                         }
@@ -233,8 +234,9 @@ class ApiClient
             $this->getCustomData($id);
         } else {
             //something failed
-            $this->mailer->sendEmail('Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$id);
+            $this->mailer->sendEmail('Error getting customdata', 'Error ' . $customDataResponse->getStatusCode() . 'URL: ' . $customDataUrl . 'ID: ' . $id);
             $this->logger->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $id, 'url' => $customDataUrl]);
         }
+        return $customData;
     }
 }
