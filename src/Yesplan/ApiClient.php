@@ -54,6 +54,7 @@ class ApiClient
     protected function request(string $method, string $path, array $options): ResponseInterface
     {
         $this->httpClient = HttpClient::create(['base_uri' => $this->options['url']]);
+
         return $this->httpClient->request($method, $path, $options);
     }
 
@@ -68,9 +69,9 @@ class ApiClient
         $timeNow = new DateTime();
         $time10Years = (new DateTime())->add(new DateInterval('P10Y'));
 
-        $dateString = $timeNow->format('d-m-Y') . '%20TO%20' . $time10Years->format('d-m-Y');
+        $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$time10Years->format('d-m-Y');
 
-        $url = 'api/events/event%3Adate%3A' . $dateString;
+        $url = 'api/events/event%3Adate%3A'.$dateString;
         while (null !== $url) {
             $response = $this->get($url, ['query' => ['api_key' => $this->options['apikey']]]);
 
@@ -94,7 +95,7 @@ class ApiClient
                         $events[$id]['eventDate'] = $data['starttime'];
 
                         $events = array_merge_recursive($events, $this->getCustomData($id));
-                      //  $events = $this->getCustomData($id);
+                        //  $events = $this->getCustomData($id);
                     }
                 }
                 if (!empty($result['pagination']['next'])) {
@@ -106,7 +107,7 @@ class ApiClient
                 //if Yesplan receives to many requests, take a coffee break
                 sleep(6);
             } else {
-                $this->mailer->sendEmail('Error getting data', 'Error ' . $response->getStatusCode() . 'URL: ' . $url);
+                $this->mailer->sendEmail('Error getting data', 'Error '.$response->getStatusCode().'URL: '.$url);
                 $this->logger->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
             }
         }
@@ -122,7 +123,7 @@ class ApiClient
     private function getCustomData(string $id): array
     {
         $customData = [];
-        $customDataUrl = 'api/event/' . $id . '/customdata';
+        $customDataUrl = 'api/event/'.$id.'/customdata';
 
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
@@ -141,7 +142,7 @@ class ApiClient
                 $customData[$id]['capacity'] = '';
                 $customData[$id]['blocked'] = '';
                 $customData[$id]['allocated'] = '';
-                
+
                 //Offentliggørelses dato
                 //I salg dato
                 //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
@@ -234,9 +235,10 @@ class ApiClient
             $this->getCustomData($id);
         } else {
             //something failed
-            $this->mailer->sendEmail('Error getting customdata', 'Error ' . $customDataResponse->getStatusCode() . 'URL: ' . $customDataUrl . 'ID: ' . $id);
+            $this->mailer->sendEmail('Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$id);
             $this->logger->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $id, 'url' => $customDataUrl]);
         }
+
         return $customData;
     }
 }

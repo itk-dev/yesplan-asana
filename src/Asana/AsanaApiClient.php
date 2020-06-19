@@ -14,10 +14,9 @@ use App\Controller\MailerController;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-use Symfony\Component\OptionsResolver\Options;
-
 
 class AsanaApiClient
 {
@@ -71,22 +70,26 @@ class AsanaApiClient
             'yesplan_insaleDate',
             'yesplan_percent',
         ]);
-        $resolver->setNormalizer('asana_new_event', function (Options $options, $value){
+        $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
             $value = explode(',', $value);
+
             return $value;
         });
-        $resolver->setNormalizer('asana_new_event_online', function (Options $options, $value){
+        $resolver->setNormalizer('asana_new_event_online', function (Options $options, $value) {
             $value = explode(',', $value);
+
             return $value;
-        }); 
-        $resolver->setNormalizer('asana_last_minute', function (Options $options, $value){
+        });
+        $resolver->setNormalizer('asana_last_minute', function (Options $options, $value) {
             $value = explode(',', $value);
+
             return $value;
-        }); 
-        $resolver->setNormalizer('asana_few_tickets', function (Options $options, $value){
+        });
+        $resolver->setNormalizer('asana_few_tickets', function (Options $options, $value) {
             $value = explode(',', $value);
+
             return $value;
-        }); 
+        });
     }
 
     /**
@@ -164,7 +167,6 @@ class AsanaApiClient
         if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
             $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
             $this->logger->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
-
         } else {
             $this->logger->debug('Card created yesplan_id: ', ['yesplan_id' => $this->options['yesplan_id']]);
         }

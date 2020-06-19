@@ -39,7 +39,7 @@ class EventManager
         $this->logger->info('update events');
 
         $events = $this->apiClient->getEvents();
-        
+
         foreach ($events as $data) {
             $eventid = $data['id'];
             $event = $this->eventRepository->find($eventid);
@@ -77,7 +77,7 @@ class EventManager
                 if ($publicationDate) {
                     $event->setPublicationDate($publicationDate);
                 }
-                 $event->setPresaleDate($this->getDateTime($data['presale_date']));
+                $event->setPresaleDate($this->getDateTime($data['presale_date']));
             }
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['presale_date'])) {
@@ -112,8 +112,9 @@ class EventManager
         }
         $this->entityManager->flush();
     }
-    /** 
-     * Get datetime from string - log conversion errors
+
+    /**
+     * Get datetime from string - log conversion errors.
      */
     private function getDateTime(string $dateTimeString)
     {
