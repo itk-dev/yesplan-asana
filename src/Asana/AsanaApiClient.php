@@ -11,6 +11,7 @@
 namespace App\Asana;
 
 use App\Controller\MailerController;
+use App\Traits\LoggerTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,9 +21,11 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AsanaApiClient
 {
+    use LoggerTrait;
+
     private $options;
     private $mailer;
-    private $logger;
+
     /** @var HttpClientInterface */
     private $httpClient;
     private const DATETIME_FORMAT = 'Y-m-d H:i:s';
@@ -34,7 +37,7 @@ class AsanaApiClient
 
         $this->options = $resolver->resolve($asanaApiClientOptions);
         $this->mailer = $mailer;
-        $this->logger = $logger;
+        $this->setLogger($logger);
     }
 
     public function post(string $path, array $options): ResponseInterface
@@ -166,9 +169,9 @@ class AsanaApiClient
 
         if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
             $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-            $this->logger->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
+            $this->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
         } else {
-            $this->logger->debug('Card created yesplan_id: ', ['yesplan_id' => $this->options['yesplan_id']]);
+            $this->debug('Card created yesplan_id: ', ['yesplan_id' => $this->options['yesplan_id']]);
         }
     }
 }
