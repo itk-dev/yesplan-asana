@@ -11,6 +11,7 @@
 namespace App\Yesplan;
 
 use App\Controller\MailerController;
+use App\Traits\LoggerTrait;
 use DateInterval;
 use Datetime;
 use Psr\Log\LoggerInterface;
@@ -21,8 +22,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ApiClient
 {
+    use LoggerTrait;
+
     private $options;
-    private $logger;
     private $mailer;
     private $httpClient;
 
@@ -31,7 +33,7 @@ class ApiClient
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         $this->options = $resolver->resolve($yesplanApiClientOptions);
-        $this->logger = $logger;
+        $this->setLogger($logger);
         $this->mailer = $mailer;
     }
 
@@ -63,7 +65,7 @@ class ApiClient
      */
     public function getEvents(): array
     {
-        $this->logger->info('Get events running');
+        $this->info('Get events running');
         $events = [];
 
         $timeNow = new DateTime();
@@ -106,7 +108,7 @@ class ApiClient
                 sleep(6);
             } else {
                 $this->mailer->sendEmail('Error getting data', 'Error '.$response->getStatusCode().'URL: '.$url);
-                $this->logger->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
+                $this->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
             }
         }
 
@@ -233,7 +235,7 @@ class ApiClient
         } else {
             //something failed
             $this->mailer->sendEmail('Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$event['id']);
-            $this->logger->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $event['id'], 'url' => $customDataUrl]);
+            $this->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $event['id'], 'url' => $customDataUrl]);
         }
     }
 }
