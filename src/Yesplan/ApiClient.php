@@ -81,12 +81,11 @@ class ApiClient
                 $result = $response->toArray();
 
                 foreach ($result['data'] as $data) {
-
                     if (!empty($data['id'])) {
                         $id = $data['id'];
                         $event = [
-                            'id' => $id, 
-                            'data' => $data, 
+                            'id' => $id,
+                            'data' => $data,
                             'title' => $data['name'],
                              //if an event has multiple locations, this will only get the first
                             'location' => $data['locations'][0]['name'] ?? '',
@@ -95,13 +94,10 @@ class ApiClient
 
                         $this->loadCustomData($event);
 
-                        $events[$id]  = $event;
+                        $events[$id] = $event;
                     }
-
-
                 }
                 $url = $result['pagination']['next'] ?? null;
-
             } elseif (Response::HTTP_TOO_MANY_REQUESTS === $response->getStatusCode()) {
                 //if Yesplan receives to many requests, take a coffee break
                 //@TODO
@@ -121,7 +117,7 @@ class ApiClient
     private function loadCustomData(array &$event)
     {
         $customDataUrl = 'api/event/'.$event['id'].'/customdata';
-    
+
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
             $customDataResult = $customDataResponse->toArray();
