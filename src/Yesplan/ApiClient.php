@@ -79,32 +79,30 @@ class ApiClient
                 $result = $response->toArray();
 
                 foreach ($result['data'] as $data) {
+
                     if (!empty($data['id'])) {
                         $id = $data['id'];
-                        $events[$id]['id'] = $id;
-                        $events[$id]['data'] = $data;
-                        $events[$id]['title'] = $data['name'];
-                        $events[$id]['location'] = '';
+                        $event = [
+                            'id' => $id, 
+                            'data' => $data, 
+                            'title' => $data['name'],
+                             //if an event has multiple locations, this will only get the first
+                            'location' => $data['locations'][0]['name'] ?? '',
+                            'eventDate' => $data['starttime'],
+                        ];
 
-                        //if an event has multiple locations, this will only get the first
+                        $this->loadCustomData($event);
 
-                        if (!empty($data['locations']['next'])) {
-                            $events[$id]['location'] = $data['locations'][0]['name'];
-                        }
-
-                        $events[$id]['eventDate'] = $data['starttime'];
-
-                        $events = array_merge_recursive($events, $this->getCustomData($id));
-                        //  $events = $this->getCustomData($id);
+                        $events[$id]  = $event;
                     }
+
+
                 }
-                if (!empty($result['pagination']['next'])) {
-                    $url = $result['pagination']['next'];
-                } else {
-                    $url = null;
-                }
+                $url = $result['pagination']['next'] ?? null;
+
             } elseif (Response::HTTP_TOO_MANY_REQUESTS === $response->getStatusCode()) {
                 //if Yesplan receives to many requests, take a coffee break
+                //@TODO
                 sleep(6);
             } else {
                 $this->mailer->sendEmail('Error getting data', 'Error '.$response->getStatusCode().'URL: '.$url);
@@ -116,32 +114,29 @@ class ApiClient
     }
 
     /**
-     * Get customdata from Yesplan by eventID.
-     *
-     * @return YesplanEvent[]
+     * Load customdata from Yesplan by eventID.
      */
-    private function getCustomData(string $id): array
+    private function loadCustomData(array &$event)
     {
-        $customData = [];
-        $customDataUrl = 'api/event/'.$id.'/customdata';
-
+        $customDataUrl = 'api/event/'.$event['id'].'/customdata';
+    
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
-            $customDataresult = $customDataResponse->toArray();
+            $customDataResult = $customDataResponse->toArray();
 
-            foreach ($customDataresult['groups'] as $group) {
-                $customData[$id]['marketing_budget'] = '';
-                $customData[$id]['genre'] = '';
-                $customData[$id]['publication_date'] = '';
-                $customData[$id]['ticketinfo_sale'] = '';
-                $customData[$id]['eventonline'] = '';
-                $customData[$id]['productiononline'] = '';
-                $customData[$id]['presale_date'] = '';
-                $customData[$id]['ticketsavailable'] = '';
-                $customData[$id]['ticketsreserved'] = '';
-                $customData[$id]['capacity'] = '';
-                $customData[$id]['blocked'] = '';
-                $customData[$id]['allocated'] = '';
+            foreach ($customDataResult['groups'] as $group) {
+                $event['marketing_budget'] = '';
+                $event['genre'] = '';
+                $event['publication_date'] = '';
+                $event['ticketinfo_sale'] = '';
+                $event['eventonline'] = '';
+                $event['productiononline'] = '';
+                $event['presale_date'] = '';
+                $event['ticketsavailable'] = '';
+                $event['ticketsreserved'] = '';
+                $event['capacity'] = '';
+                $event['blocked'] = '';
+                $event['allocated'] = '';
 
                 //Offentliggørelses dato
                 //I salg dato
@@ -151,7 +146,7 @@ class ApiClient
                         if ('tix_tixobligatoriskefelter' === $tix['keyword']) {
                             foreach ($tix['children'] as $ticketPublic) {
                                 if ('ticketinfo_public' === $ticketPublic['keyword']) {
-                                    $customData[$id]['publication_date'] = $ticketPublic['value'];
+                                    $event['publication_date'] = $ticketPublic['value'];
                                 }
                             }
                         }
@@ -164,7 +159,7 @@ class ApiClient
                         if ('generelinformation_data' === $generelInformation['keyword']) {
                             foreach ($generelInformation['children'] as $information) {
                                 if ('eventinfo_web_categori' === $information['keyword']) {
-                                    $customData[$id]['genre'] = $information['value'][0];
+                                    $event['genre'] = $information['value'][0];
                                 }
                             }
                         }
@@ -177,7 +172,8 @@ class ApiClient
                         if ('budgetudgifter_andreudgifterekstern' === $budgetExpenses['keyword']) {
                             foreach ($budgetExpenses['children'] as $externalExpenses) {
                                 if ('expences_marketing' === $externalExpenses['keyword']) {
-                                    $customData[$id]['marketing_budget'] = $externalExpenses['value'];
+                                    $event['marketing_budget'] = $externalExpenses['value'];
+                                    $event['marketing_budget'] = 'test';
                                 }
                             }
                         }
@@ -193,10 +189,10 @@ class ApiClient
                         if ('tix_tixobligatoriskefelter' === $tix['keyword']) {
                             foreach ($tix['children'] as $ticketPublic) {
                                 if ('ticketinfo_sale' === $ticketPublic['keyword']) {
-                                    $this->eventArray[$id]['ticketinfo_sale'] = $ticketPublic['value'];
+                                    $event['ticketinfo_sale'] = $ticketPublic['value'];
                                 }
                                 if ('publication_date' === $ticketPublic['keyword']) {
-                                    $customData[$id]['publication_date'] = $ticketPublic['value'];
+                                    $event['publication_date'] = $ticketPublic['value'];
                                 }
                             }
                         }
@@ -204,25 +200,25 @@ class ApiClient
                         if ('tix_billetsalgtix' === $tix['keyword']) {
                             foreach ($tix['children'] as $billetsalg) {
                                 if ('tixintegrations_productiononline' === $billetsalg['keyword']) {
-                                    $customData[$id]['productiononline'] = $billetsalg['value'];
+                                    $event['productiononline'] = $billetsalg['value'];
                                 }
                                 if ('tixintegrations_eventonline' === $billetsalg['keyword']) {
-                                    $customData[$id]['eventonline'] = $billetsalg['value'];
+                                    $event['eventonline'] = $billetsalg['value'];
                                 }
                                 if ('tixintegration_ticketsavailable' === $billetsalg['keyword']) {
-                                    $customData[$id]['ticketsavailable'] = $billetsalg['value'];
+                                    $event['ticketsavailable'] = $billetsalg['value'];
                                 }
                                 if ('tixintegration_ticketsreserved' === $billetsalg['keyword']) {
-                                    $customData[$id]['ticketsreserved'] = $billetsalg['value'];
+                                    $event['ticketsreserved'] = $billetsalg['value'];
                                 }
                                 if ('tixintegrations_capacity' === $billetsalg['keyword']) {
-                                    $customData[$id]['capacity'] = $billetsalg['value'];
+                                    $event['capacity'] = $billetsalg['value'];
                                 }
                                 if ('tixintegrations_blocked' === $billetsalg['keyword']) {
-                                    $customData[$id]['blocked'] = $billetsalg['value'];
+                                    $event['blocked'] = $billetsalg['value'];
                                 }
                                 if ('tixintegrations_allocated' === $billetsalg['keyword']) {
-                                    $customData[$id]['allocated'] = $billetsalg['value'];
+                                    $event['allocated'] = $billetsalg['value'];
                                 }
                             }
                         }
@@ -231,14 +227,13 @@ class ApiClient
             }
         } elseif (Response::HTTP_TOO_MANY_REQUESTS === $customDataResponse->getStatusCode()) {
             //if Yesplan API receives to many requests, take a short break, and continue
+            //@TODO
             sleep(6);
-            $this->getCustomData($id);
+            $this->loadCustomData($event);
         } else {
             //something failed
-            $this->mailer->sendEmail('Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$id);
-            $this->logger->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $id, 'url' => $customDataUrl]);
+            $this->mailer->sendEmail('Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$event['id']);
+            $this->logger->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $event['id'], 'url' => $customDataUrl]);
         }
-
-        return $customData;
     }
 }
