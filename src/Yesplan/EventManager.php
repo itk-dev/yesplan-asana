@@ -24,7 +24,6 @@ class EventManager
     private $apiClient;
     private $eventRepository;
     private $entityManager;
-    private $logger;
 
     public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
