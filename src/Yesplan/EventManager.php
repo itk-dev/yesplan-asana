@@ -12,23 +12,25 @@ namespace App\Yesplan;
 
 use App\Entity\YesplanEvent;
 use App\Repository\YesplanEventRepository;
+use App\Traits\LoggerTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class EventManager
 {
+    use LoggerTrait;
+
     private $apiClient;
     private $eventRepository;
     private $entityManager;
-    private $logger;
 
     public function __construct(ApiClient $apiClient, YesplanEventRepository $eventRepository, EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->apiClient = $apiClient;
         $this->eventRepository = $eventRepository;
         $this->entityManager = $entityManager;
-        $this->logger = $logger;
+        $this->setLogger($logger);
     }
 
     /**
@@ -36,7 +38,7 @@ class EventManager
      */
     public function updateEvents(): void
     {
-        $this->logger->info('update events');
+        $this->info('update events');
 
         $events = $this->apiClient->getEvents();
 
@@ -103,7 +105,7 @@ class EventManager
      */
     public function deleteOldEvents(): void
     {
-        $this->logger->info('Deleting events');
+        $this->info('Deleting events');
 
         $events = $this->eventRepository->findOldEvents();
 
@@ -120,7 +122,7 @@ class EventManager
     {
         $dateTime = DateTime::createFromFormat('Y-m-d\TG:i:se', $dateTimeString);
         if (!$dateTime) {
-            $this->logger->error('DateConversion failed {date}', ['date' => $dateTimeString, 'formatError' => DateTime::getLastErrors()]);
+            $this->error('DateConversion failed {date}', ['date' => $dateTimeString, 'formatError' => DateTime::getLastErrors()]);
             $dateTime = null;
         }
 
