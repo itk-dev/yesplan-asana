@@ -50,7 +50,7 @@ class EventManager
                 $event = new YesplanEvent();
                 $event->setId($eventid);
             }
-
+    
             $event
                 ->setData($data)
                 ->setTitle($data['title'])
