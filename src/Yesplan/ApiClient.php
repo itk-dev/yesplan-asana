@@ -69,11 +69,12 @@ class ApiClient
         $events = [];
 
         $timeNow = new DateTime();
-        $time10Years = (new DateTime())->add(new DateInterval('P10Y'));
+        //6 months
+        $timeInterval = (new DateTime())->add(new DateInterval('P10Y'));
 
-        $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$time10Years->format('d-m-Y');
+        $dateString = $timeNow->format('d-m-Y') . '%20TO%20' . $timeInterval->format('d-m-Y');
 
-        $url = 'api/events/event%3Adate%3A'.$dateString;
+        $url = 'api/events/event%3Adate%3A' . $dateString;
         while (null !== $url) {
             $response = $this->get($url, ['query' => ['api_key' => $this->options['apikey']]]);
 
@@ -82,19 +83,26 @@ class ApiClient
 
                 foreach ($result['data'] as $data) {
                     if (!empty($data['id'])) {
-                        $id = $data['id'];
-                        $event = [
-                            'id' => $id,
-                            'data' => $data,
-                            'title' => $data['name'],
-                             //if an event has multiple locations, this will only get the first
-                            'location' => $data['locations'][0]['name'] ?? '',
-                            'eventDate' => $data['starttime'],
-                        ];
+                        //Do not import data with other status than "I salg/offentliggjort", status id = 69485057-0
+                        if ($data['status']['id']  === '69485057-0') {
+                            $id = $data['id'];
+                            $event = [
+                                'id' => $id,
+                                'data' => $data,
+                                'title' => $data['name'],
+                                //if an event has multiple locations, this will only get the first
+                                'location' => $data['locations'][0]['name'] ?? '',
+                                'eventDate' => $data['starttime'],
+                                'status' => $data['status']['id'],
+                                'statusId' => $data['status']['name'],
+                                'profile' => $data['profile']['name'],
+                                'profileId' => $data['profile']['id']
+                            ];
 
-                        $this->loadCustomData($event);
+                            $this->loadCustomData($event);
 
-                        $events[$id] = $event;
+                            $events[$id] = $event;
+                        }
                     }
                 }
                 $url = $result['pagination']['next'] ?? null;
@@ -103,7 +111,7 @@ class ApiClient
                 //@TODO
                 sleep(6);
             } else {
-                $this->mailer->sendEmail('Error getting data', 'Error '.$response->getStatusCode().'URL: '.$url);
+                $this->mailer->sendEmail('Error getting data', 'Error ' . $response->getStatusCode() . 'URL: ' . $url);
                 $this->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
             }
         }
@@ -116,7 +124,7 @@ class ApiClient
      */
     private function loadCustomData(array &$event)
     {
-        $customDataUrl = 'api/event/'.$event['id'].'/customdata';
+        $customDataUrl = 'api/event/' . $event['id'] . '/customdata';
 
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
@@ -230,7 +238,7 @@ class ApiClient
             $this->loadCustomData($event);
         } else {
             //something failed
-            $this->mailer->sendEmail('Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$event['id']);
+            $this->mailer->sendEmail('Error getting customdata', 'Error ' . $customDataResponse->getStatusCode() . 'URL: ' . $customDataUrl . 'ID: ' . $event['id']);
             $this->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $event['id'], 'url' => $customDataUrl]);
         }
     }
