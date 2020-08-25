@@ -12,6 +12,7 @@ namespace App\Asana;
 
 use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
+use Doctrine\Common\Cache\VoidCache;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
@@ -63,6 +64,7 @@ class AsanaApiClient
             'asana_new_event_online',
             'asana_last_minute',
             'asana_few_tickets',
+            'asana_external_event',
             'yesplan_id',
             'yesplan_eventDate',
             'yesplan_location',
@@ -72,6 +74,8 @@ class AsanaApiClient
             'yesplan_presaleDate',
             'yesplan_insaleDate',
             'yesplan_percent',
+            'yesplan_status',
+            'yesplan_profile'
         ]);
         $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
             $value = explode(',', $value);
@@ -104,6 +108,12 @@ class AsanaApiClient
             $this->createCard($board, $values);
         }
     }
+    public function createCardNewEventsGratisandExternBoard(array $values): void
+    {
+        foreach ($this->options['asana_external_event'] as $board) {
+            $this->createCard($board, $values);
+        }
+    }
 
     /**
      * Create cards on the boards in env var ASANA_NEW_EVENT_ONLINE.
@@ -120,6 +130,7 @@ class AsanaApiClient
      */
     public function createCardLastMinute(array $values): void
     {
+        $values['titel'] = 'Last Minute: ' . $values['titel'];
         foreach ($this->options['asana_last_minute'] as $board) {
             $this->createCard($board, $values);
         }
@@ -130,6 +141,7 @@ class AsanaApiClient
      */
     public function createCartFewTickets(array $values): void
     {
+        $values['titel'] = 'Få billetter: ' . $values['titel'];
         foreach ($this->options['asana_few_tickets'] as $board) {
             $this->createCard($board, $values);
         }
@@ -161,6 +173,8 @@ class AsanaApiClient
                 'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
                 'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
                 'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
+                'custom_fields'.'['.$this->options['yesplan_status'].']' => $values['profile'],
+                'custom_fields'.'['.$this->options['yesplan_profile'].']' => $values['status'],
                 'projects' => $projectId,
             ],
         ];

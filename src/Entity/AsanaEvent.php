@@ -64,6 +64,11 @@ class AsanaEvent
      */
     private $createdInLastMinute;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $createdInNewEventsExternal;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -156,6 +161,18 @@ class AsanaEvent
     public function setCreatedInLastMinute(?bool $createdInLastMinute): self
     {
         $this->createdInLastMinute = $createdInLastMinute;
+
+        return $this;
+    }
+
+    public function getCreatedInNewEventsExternal(): ?bool
+    {
+        return $this->createdInNewEventsExternal;
+    }
+
+    public function setCreatedInNewEventsExternal(?bool $createdInNewEventsExternal): self
+    {
+        $this->createdInNewEventsExternal = $createdInNewEventsExternal;
 
         return $this;
     }

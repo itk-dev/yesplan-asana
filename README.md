@@ -18,7 +18,7 @@ docker-compose exec phpfpm bin/console app:yesplan:delete-old-events
 ```
 
 ```sh
-docker-compose exec phpfpm bin/console app:asana:createCards
+docker-compose exec phpfpm bin/console app:asana:create-cards
 ```
 
 ## Coding standards

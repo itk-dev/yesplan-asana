@@ -129,21 +129,20 @@ class ApiClient
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
             $customDataResult = $customDataResponse->toArray();
+            $event['marketing_budget'] = '';
+            $event['genre'] = '';
+            $event['publication_date'] = '';
+            $event['ticketinfo_sale'] = '';
+            $event['eventonline'] = '';
+            $event['productiononline'] = '';
+            $event['presale_date'] = '';
+            $event['ticketsavailable'] = '';
+            $event['ticketsreserved'] = '';
+            $event['capacity'] = '';
+            $event['blocked'] = '';
+            $event['allocated'] = '';
 
             foreach ($customDataResult['groups'] as $group) {
-                $event['marketing_budget'] = '';
-                $event['genre'] = '';
-                $event['publication_date'] = '';
-                $event['ticketinfo_sale'] = '';
-                $event['eventonline'] = '';
-                $event['productiononline'] = '';
-                $event['presale_date'] = '';
-                $event['ticketsavailable'] = '';
-                $event['ticketsreserved'] = '';
-                $event['capacity'] = '';
-                $event['blocked'] = '';
-                $event['allocated'] = '';
-
                 //Offentliggørelses dato
                 //I salg dato
                 //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
@@ -179,12 +178,26 @@ class ApiClient
                             foreach ($budgetExpenses['children'] as $externalExpenses) {
                                 if ('expences_marketing' === $externalExpenses['keyword']) {
                                     $event['marketing_budget'] = $externalExpenses['value'];
-                                    $event['marketing_budget'] = 'test';
                                 }
                             }
                         }
                     }
                 }
+
+                //presale date
+                //groups -> billetforhold -> ticketinfo_presaledatetime
+                if ('billetforhold' === $group['keyword']) {
+                    foreach ($group['children'] as $ticketConsiderations) {
+                        if ('billetforhold_billetinformation' === $ticketConsiderations['keyword']) {
+                            foreach ($ticketConsiderations['children'] as $ticketInformation) {
+                                if ('ticketinfo_presaledatetime' === $ticketInformation['keyword']) {
+                                    $event['presale_date'] = $ticketInformation['value'];
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                 //Offentliggørelses dato
                 //I salg dato

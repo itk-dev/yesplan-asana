@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AsanaPutCardsCommand extends Command
 {
-    protected static $defaultName = 'app:asana:createCards';
+    protected static $defaultName = 'app:asana:create-cards';
 
     private $asanaEventManager;
 

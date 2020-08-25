@@ -22,7 +22,7 @@ services:
                 asana_new_event_online: '%env(ASANA_NEW_EVENT_ONLINE)%'
                 asana_last_minute: '%env(ASANA_LAST_MINUTE)%'
                 asana_few_tickets: '%env(ASANA_FEW_TICKETS)%'
-                yesplan_id: '%env(YESPLAN_ID_FIELD)%'
+                asana_external_event: '%env(ASANA_EXTERNAL_EVENT)%'
                 yesplan_eventDate: '%env(YESPLAN_EVENTDATE_FIELD)%'
                 yesplan_location: '%env(YESPLAN_LOCATION_FIELD)%'
                 yesplan_genre: '%env(YESPLAN_GENRE_FIELD)%'
@@ -31,6 +31,10 @@ services:
                 yesplan_presaleDate: '%env(YESPLAN_PRESALEDATE_FIELD)%'
                 yesplan_insaleDate: '%env(YESPLAN_INSALEDATE_FIELD)%'
                 yesplan_percent: '%env(YESPLAN_PERCENT_FIELD)%'
+                yesplan_profile: '%env(YESPLAN_PROFILE_FIELD)%'
+                yesplan_status: '%env(YESPLAN_STATUS_FIELD)%'
+                yesplan_id: '%env(YESPLAN_ID_FIELD)%'
+
                
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
