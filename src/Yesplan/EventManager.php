@@ -82,7 +82,7 @@ class EventManager
             }
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['presale_date'])) {
-               $event->setPresaleDate($this->getDateTime($data['presale_date']));
+                $event->setPresaleDate($this->getDateTime($data['presale_date']));
             }
 
             //if date is not empty convert to datetime before setting the value
@@ -122,9 +122,8 @@ class EventManager
         $dateTime = DateTime::createFromFormat('Y-m-d+', $dateTimeString);
         if (!$dateTime) {
             $dateTime = DateTime::createFromFormat('G:i', $dateTimeString);
-           
         }
-        if(!$dateTime){
+        if (!$dateTime) {
             $this->error('DateConversion failed {date}', ['date' => $dateTimeString, 'formatError' => DateTime::getLastErrors()]);
             $dateTime = null;
         }

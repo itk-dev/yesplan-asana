@@ -15,7 +15,6 @@ use DateInterval;
 use Datetime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -35,12 +34,13 @@ class YesplanEventRepository extends ServiceEntityRepository
         $this->options = $resolver->resolve($yesplanEventRepositoryOptions);
         parent::__construct($registry, YesplanEvent::class);
     }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'yesplan_intern_profile_id',
             'yesplan_external_profile_id',
-            'yesplan_free_profile_id'
+            'yesplan_free_profile_id',
         ]);
     }
 
@@ -83,6 +83,7 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         return $stmt->fetchAll();
     }
+
     /**
      * Finds all events with productionOnline = 1 and profile extern, intern and free events.
      *

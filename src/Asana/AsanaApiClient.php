@@ -74,7 +74,7 @@ class AsanaApiClient
             'yesplan_insaleDate',
             'yesplan_percent',
             'yesplan_status',
-            'yesplan_profile'    
+            'yesplan_profile',
         ]);
         $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
             $value = explode(',', $value);
@@ -107,6 +107,7 @@ class AsanaApiClient
             $this->createCard($board, $values);
         }
     }
+
     public function createCardNewEventsGratisandExternBoard(array $values): void
     {
         foreach ($this->options['asana_external_event'] as $board) {
@@ -129,7 +130,7 @@ class AsanaApiClient
      */
     public function createCardLastMinute(array $values): void
     {
-        $values['title'] = 'Last Minute: ' . $values['title'];
+        $values['title'] = 'Last Minute: '.$values['title'];
         foreach ($this->options['asana_last_minute'] as $board) {
             $this->createCard($board, $values);
         }
@@ -140,7 +141,7 @@ class AsanaApiClient
      */
     public function createCartFewTickets(array $values): void
     {
-        $values['title'] = 'Få billetter: ' . $values['title'];
+        $values['title'] = 'Få billetter: '.$values['title'];
         foreach ($this->options['asana_few_tickets'] as $board) {
             $this->createCard($board, $values);
         }

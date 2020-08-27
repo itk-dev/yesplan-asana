@@ -27,12 +27,13 @@ class MailerController extends AbstractController
         $this->options = $resolver->resolve($mailerOptions);
         $this->mailer = $mailer;
     }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
                 'mail_to',
                 'mail_prefix',
-                'mail_from'
+                'mail_from',
                 ]);
     }
 

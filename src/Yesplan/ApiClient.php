@@ -45,7 +45,7 @@ class ApiClient
         $resolver->setRequired([
             'apikey',
             'url',
-            'status_id'
+            'status_id',
         ]);
     }
 
@@ -73,9 +73,9 @@ class ApiClient
         //6 months
         $timeInterval = (new DateTime())->add(new DateInterval('P6M'));
 
-        $dateString = $timeNow->format('d-m-Y') . '%20TO%20' . $timeInterval->format('d-m-Y');
+        $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$timeInterval->format('d-m-Y');
 
-        $url = 'api/events/event%3Adate%3A' . $dateString;
+        $url = 'api/events/event%3Adate%3A'.$dateString;
         while (null !== $url) {
             $response = $this->get($url, ['query' => ['api_key' => $this->options['apikey']]]);
 
@@ -85,7 +85,7 @@ class ApiClient
                 foreach ($result['data'] as $data) {
                     if (!empty($data['id'])) {
                         //Do not import data with other status than "I salg/offentliggjort", status id = 69485057-0
-                        if ($data['status']['id']  === $this->options['status_id']) {
+                        if ($data['status']['id'] === $this->options['status_id']) {
                             $id = $data['id'];
                             $event = [
                                 'id' => $id,
@@ -97,7 +97,7 @@ class ApiClient
                                 'status' => $data['status']['id'],
                                 'statusId' => $data['status']['name'],
                                 'profile' => $data['profile']['name'],
-                                'profileId' => $data['profile']['id']
+                                'profileId' => $data['profile']['id'],
                             ];
 
                             $this->loadCustomData($event);
@@ -112,7 +112,7 @@ class ApiClient
                 //@TODO
                 sleep(6);
             } else {
-                $this->mailer->sendEmail('Error getting data', 'Error ' . $response->getStatusCode() . 'URL: ' . $url);
+                $this->mailer->sendEmail('Error getting data', 'Error '.$response->getStatusCode().'URL: '.$url);
                 $this->error('Error getting data', ['HTTPResponseCode' => $response->getStatusCode(), 'url' => $url]);
             }
         }
@@ -125,7 +125,7 @@ class ApiClient
      */
     private function loadCustomData(array &$event)
     {
-        $customDataUrl = 'api/event/' . $event['id'] . '/customdata';
+        $customDataUrl = 'api/event/'.$event['id'].'/customdata';
 
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
@@ -199,7 +199,6 @@ class ApiClient
                     }
                 }
 
-
                 //Offentliggørelses dato
                 //I salg dato
                 //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
@@ -252,7 +251,7 @@ class ApiClient
             $this->loadCustomData($event);
         } else {
             //something failed
-            $this->mailer->sendEmail('Error getting customdata', 'Error ' . $customDataResponse->getStatusCode() . 'URL: ' . $customDataUrl . 'ID: ' . $event['id']);
+            $this->mailer->sendEmail('Error getting customdata', 'Error '.$customDataResponse->getStatusCode().'URL: '.$customDataUrl.'ID: '.$event['id']);
             $this->error('Error getting custom data', ['HTTPResponseCode' => $customDataResponse->getStatusCode(), 'id' => $event['id'], 'url' => $customDataUrl]);
         }
     }

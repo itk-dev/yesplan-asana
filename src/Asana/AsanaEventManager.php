@@ -55,7 +55,6 @@ class AsanaEventManager
             $this->asanaApiClient->createCardLastMinute($eventData);
             $this->cardCreated($lastMinuteEvent['id'], self::LAST_MINUTE);
         }
-        
 
         foreach ($fewTicketEvents as $fewTicketEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($fewTicketEvent['id']));
@@ -69,7 +68,6 @@ class AsanaEventManager
             $this->cardCreated($eventsOnlineEvent['id'], self::EVENTS_ONLINE);
         }
 
-
         foreach ($eventsNewEvents as $eventsNewEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($eventsNewEvent['id']));
             $this->asanaApiClient->createCardNewEventsBoard($eventData);
@@ -81,7 +79,6 @@ class AsanaEventManager
             $this->asanaApiClient->createCardNewEventsBoard($eventData);
             $this->cardCreated($eventsNewEventExternal['id'], self::EVENTS_EXTERN);
         }
-        
     }
 
     /**
@@ -103,7 +100,7 @@ class AsanaEventManager
             'profile' => $event->getProfile(),
             'profileId' => $event->getProfileId(),
             'status' => $event->getStatus(),
-            'statusId' => $event->getStatusId()
+            'statusId' => $event->getStatusId(),
         ];
 
         return $eventData;
