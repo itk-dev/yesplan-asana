@@ -62,24 +62,23 @@ class EventManager
                 ->setTicketsReserved((int) $data['ticketsreserved'])
                 ->setTicketsAvailable((int) $data['ticketsavailable'])
                 ->setProductionOnline($data['productiononline'])
-                ->setEventOnline($data['eventonline']);
+                ->setEventOnline($data['eventonline'])
+                ->setStatus($data['status'])
+                ->setStatusId($data['statusId'])
+                ->setProfile($data['profile'])
+                ->setProfileId($data['profileId']);
 
             $capacityPercentage = 0;
 
             //(tixintegrations_ticketsavailable + tixintegrations_ticketsreserved) / (tixintegrations_capacity - tixintegrations_blocked - tixintegrations_allocated) * 100
             if ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated() > 0) {
-                $capacityPercentage = ($event->getTicketsAvailable() + $event->getTicketsReserved()) / ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated()) * 100;
+                $capacityPercentage = 100 - ($event->getTicketsAvailable() + $event->getTicketsReserved()) / ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated()) * 100;
             }
             $event->setCapacityPercent($capacityPercentage);
 
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['publication_date'])) {
-                $publicationDate = DateTime::createFromFormat('Y-m-d\TG:i:se', $data['publication_date']);
-                //dont add date if conversion fails - should be logged
-                if ($publicationDate) {
-                    $event->setPublicationDate($publicationDate);
-                }
-                $event->setPresaleDate($this->getDateTime($data['presale_date']));
+                $event->setPublicationDate($this->getDateTime($data['publication_date']));
             }
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['presale_date'])) {
@@ -120,7 +119,10 @@ class EventManager
      */
     private function getDateTime(string $dateTimeString)
     {
-        $dateTime = DateTime::createFromFormat('Y-m-d\TG:i:se', $dateTimeString);
+        $dateTime = DateTime::createFromFormat('Y-m-d+', $dateTimeString);
+        if (!$dateTime) {
+            $dateTime = DateTime::createFromFormat('G:i', $dateTimeString);
+        }
         if (!$dateTime) {
             $this->error('DateConversion failed {date}', ['date' => $dateTimeString, 'formatError' => DateTime::getLastErrors()]);
             $dateTime = null;

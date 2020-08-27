@@ -45,6 +45,7 @@ class ApiClient
         $resolver->setRequired([
             'apikey',
             'url',
+            'status_id',
         ]);
     }
 
@@ -69,9 +70,10 @@ class ApiClient
         $events = [];
 
         $timeNow = new DateTime();
-        $time10Years = (new DateTime())->add(new DateInterval('P10Y'));
+        //6 months
+        $timeInterval = (new DateTime())->add(new DateInterval('P6M'));
 
-        $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$time10Years->format('d-m-Y');
+        $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$timeInterval->format('d-m-Y');
 
         $url = 'api/events/event%3Adate%3A'.$dateString;
         while (null !== $url) {
@@ -82,19 +84,26 @@ class ApiClient
 
                 foreach ($result['data'] as $data) {
                     if (!empty($data['id'])) {
-                        $id = $data['id'];
-                        $event = [
-                            'id' => $id,
-                            'data' => $data,
-                            'title' => $data['name'],
-                             //if an event has multiple locations, this will only get the first
-                            'location' => $data['locations'][0]['name'] ?? '',
-                            'eventDate' => $data['starttime'],
-                        ];
+                        //Do not import data with other status than "I salg/offentliggjort", status id = 69485057-0
+                        if ($data['status']['id'] === $this->options['status_id']) {
+                            $id = $data['id'];
+                            $event = [
+                                'id' => $id,
+                                'data' => $data,
+                                'title' => $data['name'],
+                                //if an event has multiple locations, this will only get the first
+                                'location' => $data['locations'][0]['name'] ?? '',
+                                'eventDate' => $data['starttime'],
+                                'status' => $data['status']['id'],
+                                'statusId' => $data['status']['name'],
+                                'profile' => $data['profile']['name'],
+                                'profileId' => $data['profile']['id'],
+                            ];
 
-                        $this->loadCustomData($event);
+                            $this->loadCustomData($event);
 
-                        $events[$id] = $event;
+                            $events[$id] = $event;
+                        }
                     }
                 }
                 $url = $result['pagination']['next'] ?? null;
@@ -121,21 +130,20 @@ class ApiClient
         $customDataResponse = $this->get($customDataUrl, ['query' => ['api_key' => $this->options['apikey']]]);
         if (Response::HTTP_OK === $customDataResponse->getStatusCode()) {
             $customDataResult = $customDataResponse->toArray();
+            $event['marketing_budget'] = '';
+            $event['genre'] = '';
+            $event['publication_date'] = '';
+            $event['ticketinfo_sale'] = '';
+            $event['eventonline'] = '';
+            $event['productiononline'] = '';
+            $event['presale_date'] = '';
+            $event['ticketsavailable'] = '';
+            $event['ticketsreserved'] = '';
+            $event['capacity'] = '';
+            $event['blocked'] = '';
+            $event['allocated'] = '';
 
             foreach ($customDataResult['groups'] as $group) {
-                $event['marketing_budget'] = '';
-                $event['genre'] = '';
-                $event['publication_date'] = '';
-                $event['ticketinfo_sale'] = '';
-                $event['eventonline'] = '';
-                $event['productiononline'] = '';
-                $event['presale_date'] = '';
-                $event['ticketsavailable'] = '';
-                $event['ticketsreserved'] = '';
-                $event['capacity'] = '';
-                $event['blocked'] = '';
-                $event['allocated'] = '';
-
                 //Offentliggørelses dato
                 //I salg dato
                 //groups -> tix -> tix_tixobligatoriskefelter -> ticketinfo_public
@@ -171,7 +179,20 @@ class ApiClient
                             foreach ($budgetExpenses['children'] as $externalExpenses) {
                                 if ('expences_marketing' === $externalExpenses['keyword']) {
                                     $event['marketing_budget'] = $externalExpenses['value'];
-                                    $event['marketing_budget'] = 'test';
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //presale date
+                //groups -> billetforhold -> ticketinfo_presaledatetime
+                if ('billetforhold' === $group['keyword']) {
+                    foreach ($group['children'] as $ticketConsiderations) {
+                        if ('billetforhold_billetinformation' === $ticketConsiderations['keyword']) {
+                            foreach ($ticketConsiderations['children'] as $ticketInformation) {
+                                if ('ticketinfo_presaledatetime' === $ticketInformation['keyword']) {
+                                    $event['presale_date'] = $ticketInformation['value'];
                                 }
                             }
                         }

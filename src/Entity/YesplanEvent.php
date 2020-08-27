@@ -115,6 +115,26 @@ class YesplanEvent
      */
     private $capacityPercent;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $status;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $statusId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $profile;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $profileId;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -327,6 +347,54 @@ class YesplanEvent
     public function setCapacityPercent(?string $capacityPercent): self
     {
         $this->capacityPercent = $capacityPercent;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getStatusId(): ?string
+    {
+        return $this->statusId;
+    }
+
+    public function setStatusId(?string $statusId): self
+    {
+        $this->statusId = $statusId;
+
+        return $this;
+    }
+
+    public function getProfile(): ?string
+    {
+        return $this->profile;
+    }
+
+    public function setProfile(?string $profile): self
+    {
+        $this->profile = $profile;
+
+        return $this;
+    }
+
+    public function getProfileId(): ?string
+    {
+        return $this->profileId;
+    }
+
+    public function setProfileId(?string $profileId): self
+    {
+        $this->profileId = $profileId;
 
         return $this;
     }

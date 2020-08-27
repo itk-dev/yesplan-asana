@@ -22,6 +22,7 @@ class AsanaEventManager
     private const FEW_TICKETS = 'FewTickets';
     private const EVENTS_ONLINE = 'EventsOnline';
     private const EVENTS = 'Events';
+    private const EVENTS_EXTERN = 'EventsExtern';
     private $asanaApiClient;
     private $eventRepository;
     private $entityManager;
@@ -46,6 +47,7 @@ class AsanaEventManager
         $fewTicketEvents = $this->eventRepository->findFewTickets();
         $eventsOnlineEvents = $this->eventRepository->findNewEventOnlineEvents();
         $eventsNewEvents = $this->eventRepository->findNewProductionOnlineEvents();
+        $eventsNewEventsExternal = $this->eventRepository->findNewProductionOnlineIncludingGratisandExternEvents();
 
         //create the cards, and update asanaEvent table
         foreach ($lastMinutEvents as $lastMinuteEvent) {
@@ -71,6 +73,12 @@ class AsanaEventManager
             $this->asanaApiClient->createCardNewEventsBoard($eventData);
             $this->cardCreated($eventsNewEvent['id'], self::EVENTS);
         }
+
+        foreach ($eventsNewEventsExternal as $eventsNewEventExternal) {
+            $eventData = $this->getEventData($this->eventRepository->find($eventsNewEventExternal['id']));
+            $this->asanaApiClient->createCardNewEventsBoard($eventData);
+            $this->cardCreated($eventsNewEventExternal['id'], self::EVENTS_EXTERN);
+        }
     }
 
     /**
@@ -80,7 +88,7 @@ class AsanaEventManager
     {
         $eventData = [
             'id' => $event->getId(),
-            'titel' => $event->getTitle(),
+            'title' => $event->getTitle(),
             'eventdate' => $event->getEventDate(),
             'location' => $event->getLocation(),
             'genre' => $event->getGenre(),
@@ -89,6 +97,10 @@ class AsanaEventManager
             'presaleDate' => $event->getPresaleDate(),
             'insaleDate' => $event->getInSaleDate(),
             'percent' => $event->getCapacityPercent(),
+            'profile' => $event->getProfile(),
+            'profileId' => $event->getProfileId(),
+            'status' => $event->getStatus(),
+            'statusId' => $event->getStatusId(),
         ];
 
         return $eventData;
@@ -119,6 +131,9 @@ class AsanaEventManager
                 break;
             case self::EVENTS:
                 $card->setCreatedInNewEvents(true);
+                break;
+            case self::EVENTS_EXTERN:
+                $card->setCreatedInNewEventsExternal(true);
                 break;
         }
         $this->entityManager->persist($card);

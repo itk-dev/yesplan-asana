@@ -13,16 +13,28 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MailerController extends AbstractController
 {
     private $mailer;
-    private $to = 'lilosti@aarhus.dk';
-    private $prefix = 'dev';
 
-    public function __construct(MailerInterface $mailer)
+    public function __construct(array $mailerOptions, MailerInterface $mailer)
     {
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+
+        $this->options = $resolver->resolve($mailerOptions);
         $this->mailer = $mailer;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setRequired([
+                'mail_to',
+                'mail_prefix',
+                'mail_from',
+                ]);
     }
 
     /**
@@ -31,13 +43,13 @@ class MailerController extends AbstractController
     public function sendEmail(string $subject, string $message): void
     {
         $email = (new Email())
-            ->from('asanayesplanintegration@musikhusaarhus.dk')
-            ->to($this->to)
+            ->from($this->options['mail_from'])
+            ->to($this->options['mail_to'])
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
-            ->subject($this->prefix.' '.$subject)
+            ->subject($this->options['mail_prefix'].' '.$subject)
             ->text($message)
             ->html($message);
 

@@ -63,6 +63,7 @@ class AsanaApiClient
             'asana_new_event_online',
             'asana_last_minute',
             'asana_few_tickets',
+            'asana_external_event',
             'yesplan_id',
             'yesplan_eventDate',
             'yesplan_location',
@@ -72,6 +73,8 @@ class AsanaApiClient
             'yesplan_presaleDate',
             'yesplan_insaleDate',
             'yesplan_percent',
+            'yesplan_status',
+            'yesplan_profile',
         ]);
         $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
             $value = explode(',', $value);
@@ -105,6 +108,13 @@ class AsanaApiClient
         }
     }
 
+    public function createCardNewEventsGratisandExternBoard(array $values): void
+    {
+        foreach ($this->options['asana_external_event'] as $board) {
+            $this->createCard($board, $values);
+        }
+    }
+
     /**
      * Create cards on the boards in env var ASANA_NEW_EVENT_ONLINE.
      */
@@ -120,6 +130,7 @@ class AsanaApiClient
      */
     public function createCardLastMinute(array $values): void
     {
+        $values['title'] = 'Last Minute: '.$values['title'];
         foreach ($this->options['asana_last_minute'] as $board) {
             $this->createCard($board, $values);
         }
@@ -130,6 +141,7 @@ class AsanaApiClient
      */
     public function createCartFewTickets(array $values): void
     {
+        $values['title'] = 'Få billetter: '.$values['title'];
         foreach ($this->options['asana_few_tickets'] as $board) {
             $this->createCard($board, $values);
         }
@@ -151,7 +163,7 @@ class AsanaApiClient
         $url = $this->options['asana_url'];
         $options = [
             'body' => [
-                'name' => $values['titel'],
+                'name' => $values['title'],
                 'custom_fields'.'['.$this->options['yesplan_id'].']' => $values['id'],
                 'custom_fields'.'['.$this->options['yesplan_eventDate'].']' => $eventDate,
                 'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],
@@ -161,6 +173,8 @@ class AsanaApiClient
                 'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
                 'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
                 'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
+                'custom_fields'.'['.$this->options['yesplan_status'].']' => $values['profile'],
+                'custom_fields'.'['.$this->options['yesplan_profile'].']' => $values['status'],
                 'projects' => $projectId,
             ],
         ];
