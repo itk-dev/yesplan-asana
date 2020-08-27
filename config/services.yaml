@@ -15,6 +15,7 @@ services:
             $yesplanApiClientOptions: 
                 url: '%env(YESPLAN_URL)%'
                 apikey: '%env(YESPLAN_APIKEY)%'
+                status_id: '%env(YESPLAN_STATUSID)%'
             $asanaApiClientOptions:
                 bearer: '%env(ASANA_BEARER)%'
                 asana_url: '%env(ASANA_URL)%'
@@ -34,6 +35,14 @@ services:
                 yesplan_profile: '%env(YESPLAN_PROFILE_FIELD)%'
                 yesplan_status: '%env(YESPLAN_STATUS_FIELD)%'
                 yesplan_id: '%env(YESPLAN_ID_FIELD)%'
+            $mailerOptions:
+                mail_to: '%env(MAIL_TO)%'
+                mail_prefix: '%env(MAIL_PREFIX)%'
+                mail_from: '%env(MAIL_FROM)%'
+            $yesplanEventRepositoryOptions:
+                yesplan_intern_profile_id: '%env(YESPLAN_INTERN_PROFILEID)%'
+                yesplan_external_profile_id: '%env(YESPLAN_EXTERNAL_PROFILEID)%'
+                yesplan_free_profile_id: '%env(YESPLAN_FREE_PROFILEID)%'
 
                
     # makes classes in src/ available to be used as services

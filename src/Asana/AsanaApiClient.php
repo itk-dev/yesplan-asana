@@ -12,7 +12,6 @@ namespace App\Asana;
 
 use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
-use Doctrine\Common\Cache\VoidCache;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
@@ -75,7 +74,7 @@ class AsanaApiClient
             'yesplan_insaleDate',
             'yesplan_percent',
             'yesplan_status',
-            'yesplan_profile'
+            'yesplan_profile'    
         ]);
         $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
             $value = explode(',', $value);
@@ -130,7 +129,7 @@ class AsanaApiClient
      */
     public function createCardLastMinute(array $values): void
     {
-        $values['titel'] = 'Last Minute: ' . $values['titel'];
+        $values['title'] = 'Last Minute: ' . $values['title'];
         foreach ($this->options['asana_last_minute'] as $board) {
             $this->createCard($board, $values);
         }
@@ -141,7 +140,7 @@ class AsanaApiClient
      */
     public function createCartFewTickets(array $values): void
     {
-        $values['titel'] = 'Få billetter: ' . $values['titel'];
+        $values['title'] = 'Få billetter: ' . $values['title'];
         foreach ($this->options['asana_few_tickets'] as $board) {
             $this->createCard($board, $values);
         }
@@ -163,7 +162,7 @@ class AsanaApiClient
         $url = $this->options['asana_url'];
         $options = [
             'body' => [
-                'name' => $values['titel'],
+                'name' => $values['title'],
                 'custom_fields'.'['.$this->options['yesplan_id'].']' => $values['id'],
                 'custom_fields'.'['.$this->options['yesplan_eventDate'].']' => $eventDate,
                 'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],

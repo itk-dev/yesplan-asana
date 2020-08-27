@@ -49,8 +49,6 @@ class AsanaEventManager
         $eventsNewEvents = $this->eventRepository->findNewProductionOnlineEvents();
         $eventsNewEventsExternal = $this->eventRepository->findNewProductionOnlineIncludingGratisandExternEvents();
 
-     //   print_r($lastMinutEvents);
-
         //create the cards, and update asanaEvent table
         foreach ($lastMinutEvents as $lastMinuteEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
@@ -93,7 +91,7 @@ class AsanaEventManager
     {
         $eventData = [
             'id' => $event->getId(),
-            'titel' => $event->getTitle(),
+            'title' => $event->getTitle(),
             'eventdate' => $event->getEventDate(),
             'location' => $event->getLocation(),
             'genre' => $event->getGenre(),

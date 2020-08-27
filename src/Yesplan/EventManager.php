@@ -82,7 +82,7 @@ class EventManager
             }
             //if date is not empty convert to datetime before setting the value
             if (!empty($data['presale_date'])) {
-             //   $event->setPresaleDate($this->getDateTime($data['presale_date']));
+               $event->setPresaleDate($this->getDateTime($data['presale_date']));
             }
 
             //if date is not empty convert to datetime before setting the value

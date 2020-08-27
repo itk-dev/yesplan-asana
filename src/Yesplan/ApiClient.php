@@ -45,6 +45,7 @@ class ApiClient
         $resolver->setRequired([
             'apikey',
             'url',
+            'status_id'
         ]);
     }
 
@@ -84,7 +85,7 @@ class ApiClient
                 foreach ($result['data'] as $data) {
                     if (!empty($data['id'])) {
                         //Do not import data with other status than "I salg/offentliggjort", status id = 69485057-0
-                        if ($data['status']['id']  === '69485057-0') {
+                        if ($data['status']['id']  === $this->options['status_id']) {
                             $id = $data['id'];
                             $event = [
                                 'id' => $id,
