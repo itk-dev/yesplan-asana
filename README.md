@@ -3,12 +3,12 @@ Yesplan-asana is a project for copying eventinformation from Yesplan and Asana. 
 We have created 5 different event "filters":
 
 Profile = Internal events:
-  'LastMinute': LastMinute events is defined as events with capacitypercentage < 75, and event is scheduled int the next 3 weeks
-  'FewTickets': FewTickest events is defined as events with capacitypercentage > 90
-  'EventsOnline': EventsOnline events is defined as events with eventOnline from Yesplan = 1
-  'Events': is defined as events with productionOnline from Yesplan = 1
+  *'LastMinute': LastMinute events is defined as events with capacitypercentage < 75, and event is scheduled int the next 3 weeks
+  *'FewTickets': FewTickest events is defined as events with capacitypercentage > 90
+  *'EventsOnline': EventsOnline events is defined as events with eventOnline from Yesplan = 1
+  *'Events': is defined as events with productionOnline from Yesplan = 1
 Profile = External and free events:
-  'EventsExtern': is defined as events with productionOnline from Yesplan = 1
+  *'EventsExtern': is defined as events with productionOnline from Yesplan = 1
   
 We only filter on events with the status = I salg/offentliggjort.
 
