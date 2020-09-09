@@ -7,6 +7,7 @@ Profile = Internal events:
   * 'FewTickets': FewTickest events is defined as events with capacitypercentage > 90
   * 'EventsOnline': EventsOnline events is defined as events with eventOnline from Yesplan = 1
   * 'Events': is defined as events with productionOnline from Yesplan = 1
+
 Profile = External and free events:
   * 'EventsExtern': is defined as events with productionOnline from Yesplan = 1
   
