@@ -39,7 +39,7 @@ services:
                 mail_to: '%env(MAIL_TO)%'
                 mail_prefix: '%env(MAIL_PREFIX)%'
                 mail_from: '%env(MAIL_FROM)%'
-            $yesplanEventRepositoryOptions:
+            $yesplanEventRepositoryOptions  :
                 yesplan_intern_profile_id: '%env(YESPLAN_INTERN_PROFILEID)%'
                 yesplan_external_profile_id: '%env(YESPLAN_EXTERNAL_PROFILEID)%'
                 yesplan_free_profile_id: '%env(YESPLAN_FREE_PROFILEID)%'
