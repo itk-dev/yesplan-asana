@@ -96,6 +96,11 @@ class AsanaApiClient
 
             return $value;
         });
+        $resolver->setNormalizer('asana_external_event', function (Options $options, $value) {
+            $value = explode(',', $value);
+
+            return $value;
+        });
     }
 
     /**
@@ -173,8 +178,8 @@ class AsanaApiClient
                 'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
                 'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
                 'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
-                'custom_fields'.'['.$this->options['yesplan_status'].']' => $values['profile'],
-                'custom_fields'.'['.$this->options['yesplan_profile'].']' => $values['status'],
+                'custom_fields'.'['.$this->options['yesplan_status'].']' => $values['status'],
+                'custom_fields'.'['.$this->options['yesplan_profile'].']' => $values['profile'],
                 'projects' => $projectId,
             ],
         ];

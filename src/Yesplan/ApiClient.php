@@ -94,8 +94,8 @@ class ApiClient
                                 //if an event has multiple locations, this will only get the first
                                 'location' => $data['locations'][0]['name'] ?? '',
                                 'eventDate' => $data['starttime'],
-                                'status' => $data['status']['id'],
-                                'statusId' => $data['status']['name'],
+                                'status' => $data['status']['name'],
+                                'statusId' => $data['status']['id'],
                                 'profile' => $data['profile']['name'],
                                 'profileId' => $data['profile']['id'],
                             ];
