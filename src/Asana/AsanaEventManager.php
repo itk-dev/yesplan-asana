@@ -9,7 +9,6 @@
  */
 
 namespace App\Asana;
-
 use App\Entity\AsanaEvent;
 use App\Entity\YesplanEvent;
 use App\Repository\AsanaEventRepository;
@@ -74,7 +73,7 @@ class AsanaEventManager
             $this->asanaApiClient->createCardNewEventsBoard($eventData);
             $this->cardCreated($eventsNewEvent['id'], self::EVENTS);
         }
-
+        
         foreach ($eventsNewEventsExternal as $eventsNewEventExternal) {
             $eventData = $this->getEventData($this->eventRepository->find($eventsNewEventExternal['id']));
             $this->asanaApiClient->createCardNewEventsGratisandExternBoard($eventData);
