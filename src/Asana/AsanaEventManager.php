@@ -9,7 +9,6 @@
  */
 
 namespace App\Asana;
-
 use App\Entity\AsanaEvent;
 use App\Entity\YesplanEvent;
 use App\Repository\AsanaEventRepository;
@@ -50,7 +49,7 @@ class AsanaEventManager
         $eventsNewEventsExternal = $this->eventRepository->findNewProductionOnlineIncludingGratisandExternEvents();
 
         //create the cards, and update asanaEvent table
-        
+
         foreach ($lastMinutEvents as $lastMinuteEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
             $this->asanaApiClient->createCardLastMinute($eventData);
