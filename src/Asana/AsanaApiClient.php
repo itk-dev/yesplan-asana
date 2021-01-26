@@ -125,7 +125,7 @@ class AsanaApiClient
      */
     public function createCardsEventOnline(array $values): void
     {
-        foreach ($this->options['asana_new_event'] as $board) {
+        foreach ($this->options['asana_new_event_online'] as $board) {
             $this->createCard($board, $values);
         }
     }
