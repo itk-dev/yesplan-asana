@@ -97,10 +97,10 @@ class YesplanEventRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
-        SELECT y.id FROM yesplan_event y LEFT JOIN asana_event a ON y.id=a.id WHERE y.production_online = true AND  (a.created_in_new_events_external is null OR a.created_in_new_events_external = 0) AND (a.created_in_new_events is null OR a.created_in_new_events = 0) AND (y.profile_id = :profileIdIntern OR y.profile_id = :profileIdEkstern OR y.profile_id = :profileIdGratis)
+        SELECT y.id FROM yesplan_event y LEFT JOIN asana_event a ON y.id=a.id WHERE y.production_online = true AND  (a.created_in_new_events_external is null OR a.created_in_new_events_external = 0) AND (a.created_in_new_events is null OR a.created_in_new_events = 0) AND (y.profile_id = :profileIdEkstern OR y.profile_id = :profileIdGratis)
             ';
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['profileIdIntern' => $this->options['yesplan_intern_profile_id'], 'profileIdEkstern' => '65913345-1523601817', 'profileIdGratis' => '94388993-1526294254']);
+        $stmt->execute(['profileIdEkstern' => $this->options['yesplan_external_profile_id'], 'profileIdGratis' => $this->options['yesplan_free_profile_id']]);
 
         return $stmt->fetchAll();
     }

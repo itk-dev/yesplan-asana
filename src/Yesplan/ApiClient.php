@@ -71,7 +71,7 @@ class ApiClient
 
         $timeNow = new DateTime();
         //6 months
-        $timeInterval = (new DateTime())->add(new DateInterval('P6M'));
+        $timeInterval = (new DateTime())->add(new DateInterval('P12M'));
 
         $dateString = $timeNow->format('d-m-Y').'%20TO%20'.$timeInterval->format('d-m-Y');
 
