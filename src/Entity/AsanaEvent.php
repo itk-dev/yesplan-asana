@@ -69,6 +69,11 @@ class AsanaEvent
      */
     private $createdInNewEventsExternal;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $createdInCalendar;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -173,6 +178,18 @@ class AsanaEvent
     public function setCreatedInNewEventsExternal(?bool $createdInNewEventsExternal): self
     {
         $this->createdInNewEventsExternal = $createdInNewEventsExternal;
+
+        return $this;
+    }
+
+    public function getCreatedInCalendar(): ?bool
+    {
+        return $this->createdInCalendar;
+    }
+
+    public function setCreatedInCalendar(?bool $createdInCalendar): self
+    {
+        $this->createdInCalendar = $createdInCalendar;
 
         return $this;
     }

@@ -48,7 +48,6 @@ class EventManager
             if (null === $event) {
                 $event = new YesplanEvent();
                 $event->setId($eventid);
-                echo "test";
             }
 
             $event
