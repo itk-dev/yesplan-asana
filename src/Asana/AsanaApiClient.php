@@ -12,6 +12,7 @@ namespace App\Asana;
 
 use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
+use DateTime;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
@@ -204,83 +205,50 @@ class AsanaApiClient
         }
     }
 
+    /**
+     * Create calender card in asana using the ids for customfields put in the env, and on the calendarboard
+     * 
+     * @param projectID id of the board the card should be created on
+     * @param values array containing information about the event created
+     */
+
     public function createCalendarCard(string $projectId, array $values): void
+    {
+        $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::DATETIME_FORMAT) : '';
+        $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format(self::DATETIME_FORMAT) : '';
+        $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format(self::DATETIME_FORMAT) : '';
+        //create green cards in calendar on event date
+        $this->createCardWithColorCode($eventDate, $this->options['asana_calendar_colorfield_green'], $values, $projectId);
+
+        //create yellow cards in calendar on insale date
+        $this->createCardWithColorCode($insaleDate, $this->options['asana_calendar_colorfield_yellow'], $values, $projectId);
+
+        //create red cards in calendar on presale date
+        $this->createCardWithColorCode($presaleDate, $this->options['asana_calendar_colorfield_red'], $values, $projectId);
+    }
+
+    /**
+     * Create calender card in asana using the ids for customfields put in the env, and on the calendarboard, using different colorcodes, in the customfield for colorcodes
+     * 
+     * @param dueDate date you want the calendar card created on
+     * @param colorCodeId asana id of the wanted coloroption from the colorcode field (taken from env)
+     * @param projectID id of the board the card should be created on
+     * @param values array containing information about the event created
+     */
+    private function createCardWithColorCode(string $dueDate, string $colorCodeId, array $values, string $projectId)
     {
         $publicationDate = !empty($values['publicationdate']) ? $values['publicationdate']->format(self::DATETIME_FORMAT) : '';
         $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::DATETIME_FORMAT) : '';
         $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format(self::DATETIME_FORMAT) : '';
         $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format(self::DATETIME_FORMAT) : '';
 
-        //create green cards in calendar on event date
-        if (!empty($values['eventdate'])) {
-            $url = $this->options['asana_url'];
+        $url = $this->options['asana_url'];
+        if (!empty($dueDate)) {
             $options = [
             'body' => [
                 'name' => $values['title'],
-                'due_on' => $eventDate,
-                'custom_fields'.'['.$this->options['asana_calendar_colorfield'].']' => $this->options['asana_calendar_colorfield_green'],
-                'custom_fields'.'['.$this->options['yesplan_id'].']' => $values['id'],
-                'custom_fields'.'['.$this->options['yesplan_eventDate'].']' => $eventDate,
-                'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],
-                'custom_fields'.'['.$this->options['yesplan_genre'].']' => $values['genre'],
-                'custom_fields'.'['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
-                'custom_fields'.'['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
-                'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
-                'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
-                'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
-                'custom_fields'.'['.$this->options['yesplan_status'].']' => $values['status'],
-                'custom_fields'.'['.$this->options['yesplan_profile'].']' => $values['profile'],
-                'projects' => $projectId,
-            ],
-        ];
-
-            $response = $this->post($url, $options);
-            if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
-                $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-                $this->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
-            } else {
-                $this->debug('Card created yesplan_id: ', ['yesplan_id' => $this->options['yesplan_id']]);
-            }
-        }
-
-        //create yellow cards in calendar on insale date
-        if (!empty($values['insaleDate'])) {
-            $options = [
-            'body' => [
-                'name' => $values['title'],
-                'due_on' => $insaleDate,
-                'custom_fields'.'['.$this->options['asana_calendar_colorfield'].']' => $this->options['asana_calendar_colorfield_yellow'],
-                'custom_fields'.'['.$this->options['yesplan_id'].']' => $values['id'],
-                'custom_fields'.'['.$this->options['yesplan_eventDate'].']' => $eventDate,
-                'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],
-                'custom_fields'.'['.$this->options['yesplan_genre'].']' => $values['genre'],
-                'custom_fields'.'['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
-                'custom_fields'.'['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
-                'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
-                'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
-                'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
-                'custom_fields'.'['.$this->options['yesplan_status'].']' => $values['status'],
-                'custom_fields'.'['.$this->options['yesplan_profile'].']' => $values['profile'],
-                'projects' => $projectId,
-            ],
-        ];
-
-            $response = $this->post($url, $options);
-            if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
-                $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-                $this->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
-            } else {
-                $this->debug('Card created yesplan_id: ', ['yesplan_id' => $this->options['yesplan_id']]);
-            }
-        }
-
-        //create red cards in calendar on presale date
-        if (!empty($values['presaleDate'])) {
-            $options = [
-            'body' => [
-                'name' => $values['title'],
-                'due_on' => $presaleDate,
-                'custom_fields'.'['.$this->options['asana_calendar_colorfield'].']' => $this->options['asana_calendar_colorfield_red'],
+                'due_on' => $dueDate,
+                'custom_fields'.'['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
                 'custom_fields'.'['.$this->options['yesplan_id'].']' => $values['id'],
                 'custom_fields'.'['.$this->options['yesplan_eventDate'].']' => $eventDate,
                 'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],
