@@ -12,7 +12,6 @@ namespace App\Asana;
 
 use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
-use DateTime;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
@@ -206,30 +205,39 @@ class AsanaApiClient
     }
 
     /**
-     * Create calender card in asana using the ids for customfields put in the env, and on the calendarboard
-     * 
+     * Create calender card in asana using the ids for customfields put in the env, and on the calendarboard.
+     *
      * @param projectID id of the board the card should be created on
      * @param values array containing information about the event created
      */
-
     public function createCalendarCard(string $projectId, array $values): void
     {
         $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::DATETIME_FORMAT) : '';
         $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format(self::DATETIME_FORMAT) : '';
         $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format(self::DATETIME_FORMAT) : '';
-        //create green cards in calendar on event date
-        $this->createCardWithColorCode($eventDate, $this->options['asana_calendar_colorfield_green'], $values, $projectId);
 
-        //create yellow cards in calendar on insale date
-        $this->createCardWithColorCode($insaleDate, $this->options['asana_calendar_colorfield_yellow'], $values, $projectId);
+        $insaleDateUpdated = $values['inSaleDateUpdated'];
+        $inPresaleDateUpdated = $values['inPresaleDateUpdated'];
+        $eventDateUpdated = $values['eventDateUpdated'];
+        $isNewEvent = $values['isNewEvent'];
 
-        //create red cards in calendar on presale date
-        $this->createCardWithColorCode($presaleDate, $this->options['asana_calendar_colorfield_red'], $values, $projectId);
+        if ($eventDateUpdated || $isNewEvent) {
+            //create green cards in calendar on event date
+            $this->createCardWithColorCode($eventDate, $this->options['asana_calendar_colorfield_green'], $values, $projectId);
+        }
+        if ($insaleDateUpdated || $isNewEvent) {
+            //create yellow cards in calendar on insale date
+            $this->createCardWithColorCode($insaleDate, $this->options['asana_calendar_colorfield_yellow'], $values, $projectId);
+        }
+        if ($inPresaleDateUpdated || $isNewEvent) {
+            //create red cards in calendar on presale date
+            $this->createCardWithColorCode($presaleDate, $this->options['asana_calendar_colorfield_red'], $values, $projectId);
+        }
     }
 
     /**
-     * Create calender card in asana using the ids for customfields put in the env, and on the calendarboard, using different colorcodes, in the customfield for colorcodes
-     * 
+     * Create calender card in asana using the ids for customfields put in the env, and on the calendarboard, using different colorcodes, in the customfield for colorcodes.
+     *
      * @param dueDate date you want the calendar card created on
      * @param colorCodeId asana id of the wanted coloroption from the colorcode field (taken from env)
      * @param projectID id of the board the card should be created on
