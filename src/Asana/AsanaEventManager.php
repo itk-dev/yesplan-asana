@@ -50,38 +50,38 @@ class AsanaEventManager
         $eventsNewEvents = $this->eventRepository->findNewProductionOnlineEvents();
         $eventsNewEventsExternal = $this->eventRepository->findNewProductionOnlineIncludingGratisandExternEvents();
         $calendarEvents = $this->eventRepository->findCalendarEvents();
-        /*
-                //create the cards, and update asanaEvent table
-                foreach ($lastMinutEvents as $lastMinuteEvent) {
-                    $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
-                    $this->asanaApiClient->createCardLastMinute($eventData);
-                    $this->cardCreated($lastMinuteEvent['id'], self::LAST_MINUTE);
-                }
 
-                foreach ($fewTicketEvents as $fewTicketEvent) {
-                    $eventData = $this->getEventData($this->eventRepository->find($fewTicketEvent['id']));
-                    $this->asanaApiClient->createCartFewTickets($eventData);
-                    $this->cardCreated($fewTicketEvent['id'], self::FEW_TICKETS);
-                }
+        //create the cards, and update asanaEvent table
+        foreach ($lastMinutEvents as $lastMinuteEvent) {
+            $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
+            $this->asanaApiClient->createCardLastMinute($eventData);
+            $this->cardCreated($lastMinuteEvent['id'], self::LAST_MINUTE);
+        }
 
-                foreach ($eventsOnlineEvents as $eventsOnlineEvent) {
-                    $eventData = $this->getEventData($this->eventRepository->find($eventsOnlineEvent['id']));
-                    $this->asanaApiClient->createCardsEventOnline($eventData);
-                    $this->cardCreated($eventsOnlineEvent['id'], self::EVENTS_ONLINE);
-                }
+        foreach ($fewTicketEvents as $fewTicketEvent) {
+            $eventData = $this->getEventData($this->eventRepository->find($fewTicketEvent['id']));
+            $this->asanaApiClient->createCartFewTickets($eventData);
+            $this->cardCreated($fewTicketEvent['id'], self::FEW_TICKETS);
+        }
 
-                foreach ($eventsNewEvents as $eventsNewEvent) {
-                    $eventData = $this->getEventData($this->eventRepository->find($eventsNewEvent['id']));
-                    $this->asanaApiClient->createCardNewEventsBoard($eventData);
-                    $this->cardCreated($eventsNewEvent['id'], self::EVENTS);
-                }
+        foreach ($eventsOnlineEvents as $eventsOnlineEvent) {
+            $eventData = $this->getEventData($this->eventRepository->find($eventsOnlineEvent['id']));
+            $this->asanaApiClient->createCardsEventOnline($eventData);
+            $this->cardCreated($eventsOnlineEvent['id'], self::EVENTS_ONLINE);
+        }
 
-                foreach ($eventsNewEventsExternal as $eventsNewEventExternal) {
-                    $eventData = $this->getEventData($this->eventRepository->find($eventsNewEventExternal['id']));
-                    $this->asanaApiClient->createCardNewEventsGratisandExternBoard($eventData);
-                    $this->cardCreated($eventsNewEventExternal['id'], self::EVENTS_EXTERN);
-                }
-        */
+        foreach ($eventsNewEvents as $eventsNewEvent) {
+            $eventData = $this->getEventData($this->eventRepository->find($eventsNewEvent['id']));
+            $this->asanaApiClient->createCardNewEventsBoard($eventData);
+            $this->cardCreated($eventsNewEvent['id'], self::EVENTS);
+        }
+
+        foreach ($eventsNewEventsExternal as $eventsNewEventExternal) {
+            $eventData = $this->getEventData($this->eventRepository->find($eventsNewEventExternal['id']));
+            $this->asanaApiClient->createCardNewEventsGratisandExternBoard($eventData);
+            $this->cardCreated($eventsNewEventExternal['id'], self::EVENTS_EXTERN);
+        }
+
         foreach ($calendarEvents as $calendarEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($calendarEvent['id']));
             $this->asanaApiClient->createCardCalendarEvent($eventData);
@@ -150,10 +150,12 @@ class AsanaEventManager
             case self::CALENDAR_EVENTS:
                 $card->setCreatedInCalendar(true);
                 $yesplanevent = $this->eventRepository->find($id);
-                $yesplanevent->setInSaleDateUpdated(false);
-                $yesplanevent->setEventDateUpdated(false);
-                $yesplanevent->setInPresaleDateUpdated(false);
-                $yesplanevent->setIsNewEvent(false);
+                if (null !== $yesplanevent) {
+                    $yesplanevent->setInSaleDateUpdated(false);
+                    $yesplanevent->setEventDateUpdated(false);
+                    $yesplanevent->setInPresaleDateUpdated(false);
+                    $yesplanevent->setIsNewEvent(false);
+                }
         }
         $this->entityManager->persist($card);
 
