@@ -135,6 +135,26 @@ class YesplanEvent
      */
     private $profileId;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $inSaleDateUpdated;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $inPresaleDateUpdated;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $eventDateUpdated;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isNewEvent;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -395,6 +415,54 @@ class YesplanEvent
     public function setProfileId(?string $profileId): self
     {
         $this->profileId = $profileId;
+
+        return $this;
+    }
+
+    public function getInSaleDateUpdated(): ?bool
+    {
+        return $this->inSaleDateUpdated;
+    }
+
+    public function setInSaleDateUpdated(?bool $inSaleDateUpdated): self
+    {
+        $this->inSaleDateUpdated = $inSaleDateUpdated;
+
+        return $this;
+    }
+
+    public function getInPresaleDateUpdated(): ?bool
+    {
+        return $this->inPresaleDateUpdated;
+    }
+
+    public function setInPresaleDateUpdated(?bool $inPresaleDateUpdated): self
+    {
+        $this->inPresaleDateUpdated = $inPresaleDateUpdated;
+
+        return $this;
+    }
+
+    public function getEventDateUpdated(): ?bool
+    {
+        return $this->eventDateUpdated;
+    }
+
+    public function setEventDateUpdated(?bool $eventDateUpdated): self
+    {
+        $this->eventDateUpdated = $eventDateUpdated;
+
+        return $this;
+    }
+
+    public function getIsNewEvent(): ?bool
+    {
+        return $this->isNewEvent;
+    }
+
+    public function setIsNewEvent(?bool $isNewEvent): self
+    {
+        $this->isNewEvent = $isNewEvent;
 
         return $this;
     }

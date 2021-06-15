@@ -180,7 +180,7 @@ class YesplanEventRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
-        SELECT y.id FROM yesplan_event y LEFT JOIN asana_event a ON y.id=a.id WHERE (a.created_in_calendar is null OR a.created_in_calendar = 0) AND y.profile_id = :profileId
+        SELECT y.id FROM yesplan_event y  LEFT JOIN asana_event a ON y.id=a.id WHERE ((a.created_in_calendar is null OR a.created_in_calendar = 0) OR y.in_sale_date_updated = 1 OR y.in_presale_date_updated = 1 or y.event_date_updated = 1)  AND y.profile_id = :profileId
             ';
         $stmt = $conn->prepare($sql);
         $stmt->execute(['profileId' => $this->options['yesplan_intern_profile_id']]);

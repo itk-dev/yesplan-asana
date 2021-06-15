@@ -109,6 +109,10 @@ class AsanaEventManager
             'profileId' => $event->getProfileId(),
             'status' => $event->getStatus(),
             'statusId' => $event->getStatusId(),
+            'inSaleDateUpdated' => $event->getInSaleDateUpdated(),
+            'inPresaleDateUpdated' => $event->getInPresaleDateUpdated(),
+            'eventDateUpdated' => $event->getEventDateUpdated(),
+            'isNewEvent' => $event->getIsNewEvent(),
         ];
 
         return $eventData;
@@ -145,6 +149,13 @@ class AsanaEventManager
                 break;
             case self::CALENDAR_EVENTS:
                 $card->setCreatedInCalendar(true);
+                $yesplanevent = $this->eventRepository->find($id);
+                if (null !== $yesplanevent) {
+                    $yesplanevent->setInSaleDateUpdated(false);
+                    $yesplanevent->setEventDateUpdated(false);
+                    $yesplanevent->setInPresaleDateUpdated(false);
+                    $yesplanevent->setIsNewEvent(false);
+                }
         }
         $this->entityManager->persist($card);
 

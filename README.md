@@ -1,6 +1,6 @@
 # Yesplan-asana
 Yesplan-asana is a project for copying eventinformation from Yesplan and Asana. It has been developed as a tool for a marketing department, to make sure that all event are advetised correctly. It is making use of customfields in both Yesplan and Asana.The custominformation used in Yesplan is used for filtering events, to make sure only the events that needs to be advitised is copied and created as cards on Asana.
-Tasks are also added to a calendar board to get an overview of future and current event, when they go in presal, sale and is actually held.
+Tasks are also added to a calendar board to get an overview of future and current event, when they go in presal, sale and is actually held. When presale, insale or event dates are changed in yesplan, a new card will show up in Asana. It is a manual process to delete the old one.
 We have created 5 different event "filters":
 
 Profile = Internal events:
