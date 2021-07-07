@@ -15,8 +15,8 @@ use Psr\Log\LoggerTrait as BaseLoggerTrait;
 
 trait LoggerTrait
 {
-    use LoggerAwareTrait;
     use BaseLoggerTrait;
+    use LoggerAwareTrait;
 
     public function log($level, $message, array $context = [])
     {
