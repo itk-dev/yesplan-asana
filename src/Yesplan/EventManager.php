@@ -45,10 +45,24 @@ class EventManager
         foreach ($events as $data) {
             $eventid = $data['id'];
             $event = $this->eventRepository->find($eventid);
+            //event does not exist in database
             if (null === $event) {
                 $event = new YesplanEvent();
                 $event->setId($eventid);
-                echo "test";
+                $event->setIsNewEvent(true);
+            }
+            //event already exists in database
+            else {
+                //if any eventdates have been updated this will be set in the database for use by the celendar integration
+                if (!empty($data['ticketinfo_sale']) && $event->getInSaleDate() !== $this->getDateTime($data['ticketinfo_sale'])) {
+                    $event->setInSaleDateUpdated(true);
+                }
+                if (!empty($data['presale_date']) && $event->getInSaleDate() !== $this->getDateTime($data['presale_date'])) {
+                    $event->setInPresaleDateUpdated(true);
+                }
+                if (!empty($data['eventDate']) && $event->getInSaleDate() !== $this->getDateTime($data['eventDate'])) {
+                    $event->setEventDateUpdated(true);
+                }
             }
 
             $event

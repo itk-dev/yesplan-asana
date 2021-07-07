@@ -18,6 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class MailerController extends AbstractController
 {
     private $mailer;
+    private $options;
 
     public function __construct(array $mailerOptions, MailerInterface $mailer)
     {

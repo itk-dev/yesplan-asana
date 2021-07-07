@@ -171,4 +171,20 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         return $stmt->fetchAll();
     }
+
+    /**
+     * Finds all events not yet created in the calendar, or events with updated dates, with internal profileID.
+     */
+    public function findCalendarEvents(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+        SELECT y.id FROM yesplan_event y  LEFT JOIN asana_event a ON y.id=a.id WHERE ((a.created_in_calendar is null OR a.created_in_calendar = 0) OR y.in_sale_date_updated = 1 OR y.in_presale_date_updated = 1 or y.event_date_updated = 1)  AND y.profile_id = :profileId
+            ';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['profileId' => $this->options['yesplan_intern_profile_id']]);
+
+        return $stmt->fetchAll();
+    }
 }

@@ -1,5 +1,6 @@
 # Yesplan-asana
 Yesplan-asana is a project for copying eventinformation from Yesplan and Asana. It has been developed as a tool for a marketing department, to make sure that all event are advetised correctly. It is making use of customfields in both Yesplan and Asana.The custominformation used in Yesplan is used for filtering events, to make sure only the events that needs to be advitised is copied and created as cards on Asana.
+Tasks are also added to a calendar board to get an overview of future and current event, when they go in presal, sale and is actually held. When presale, insale or event dates are changed in yesplan, a new card will show up in Asana. It is a manual process to delete the old one.
 We have created 5 different event "filters":
 
 Profile = Internal events:
@@ -45,6 +46,8 @@ The following should contain the ID (ID's in commaseperated list) to the board(s
 * ASANA_NEW_EVENT_ONLINE=''
 * ASANA_LAST_MINUTE=''
 * ASANA_FEW_TICKETS=''
+The following should contain the ID to the board you want to use in calendar view to show events on the presale date, in sale date and on the event date:
+* ASANA_CALENDAR=''
 
 The following should contain the id to the custom Asana field, where you want the information from Yesplan:
 * YESPLAN_ID_FIELD=''
@@ -58,6 +61,13 @@ The following should contain the id to the custom Asana field, where you want th
 * YESPLAN_PERCENT_FIELD=''
 * YESPLAN_PROFILE_FIELD=''
 * YESPLAN_STATUS_FIELD=''
+* ASANA_CALENDAR_COLOR_FIELD=''
+
+The following should contain the ID of the colorvaluefields used by the colorfield (used to show different colors in the calendar):
+ASANA_CALENDAR_COLOR_FIELD_RED=''
+ASANA_CALENDAR_COLOR_FIELD_GREEN=''
+ASANA_CALENDAR_COLOR_FIELD_YELLOW=''
+
 
 This should contain SMTP address for error mail sending
 * MAILER_DSN=smtp://localhost
