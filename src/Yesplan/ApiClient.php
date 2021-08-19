@@ -17,9 +17,9 @@ use Datetime;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-use Symfony\Component\OptionsResolver\Options;
 
 class ApiClient
 {
@@ -47,7 +47,7 @@ class ApiClient
             'apikey',
             'url',
             'status_id',
-            'location_ids'
+            'location_ids',
         ]);
 
         $resolver->setNormalizer('location_ids', function (Options $options, $value) {
@@ -93,7 +93,7 @@ class ApiClient
                 foreach ($result['data'] as $data) {
                     if (!empty($data['id'])) {
                         //Do not import data with other status than "I salg/offentliggjort", status id = 69485057-0, and locations from the list set in the env
-                        if ($data['status']['id'] === $this->options['status_id'] && in_array($data['locations'][0]['id'], $this->options['location_ids'])) {
+                        if ($data['status']['id'] === $this->options['status_id'] && \in_array($data['locations'][0]['id'], $this->options['location_ids'])) {
                             $id = $data['id'];
                             $event = [
                                 'id' => $id,
