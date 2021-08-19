@@ -16,6 +16,7 @@ services:
                 url: '%env(YESPLAN_URL)%'
                 apikey: '%env(YESPLAN_APIKEY)%'
                 status_id: '%env(YESPLAN_STATUSID)%'
+                location_ids: '%env(YESPLAN_LOCATIONIDS)%'
             $asanaApiClientOptions:
                 bearer: '%env(ASANA_BEARER)%'
                 asana_url: '%env(ASANA_URL)%'
