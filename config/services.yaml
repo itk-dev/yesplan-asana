@@ -40,6 +40,7 @@ services:
                 asana_calendar_colorfield_red: '%env(ASANA_CALENDAR_COLOR_FIELD_RED)%'
                 asana_calendar_colorfield_green: '%env(ASANA_CALENDAR_COLOR_FIELD_GREEN)%'
                 asana_calendar_colorfield_yellow: '%env(ASANA_CALENDAR_COLOR_FIELD_YELLOW)%'
+                dry-run: '%env(bool:ASANA_CLIENT_DRY_RUN)%'
             $mailerOptions:
                 mail_to: '%env(MAIL_TO)%'
                 mail_prefix: '%env(MAIL_PREFIX)%'

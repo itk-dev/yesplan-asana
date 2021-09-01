@@ -10,6 +10,7 @@
 
 namespace App\Asana;
 
+use App\Contracts\HttpClient\AsanaMockResponse;
 use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
 use Psr\Log\LoggerInterface;
@@ -42,6 +43,10 @@ class AsanaApiClient
 
     public function post(string $path, array $options): ResponseInterface
     {
+        if ($this->options['dry-run']) {
+            return new AsanaMockResponse($path, $options);
+        }
+
         return $this->request('POST', $path, $options);
     }
 
@@ -81,6 +86,9 @@ class AsanaApiClient
             'asana_calendar_colorfield_green',
             'asana_calendar_colorfield_yellow',
         ]);
+
+        $resolver->setDefault('dry-run', false);
+
         $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
             $value = explode(',', $value);
 
