@@ -51,6 +51,8 @@ class ApiClient
 
     public function get(string $path, array $options): ResponseInterface
     {
+        $this->debug(sprintf('GET\'ing %s (%s)', $path, json_encode($options)));
+
         return $this->request('GET', $path, $options);
     }
 

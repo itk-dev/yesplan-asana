@@ -173,6 +173,8 @@ class AsanaApiClient
     /**
      * Creates card in asana using the ids for customfields put in the env.
      *
+     * @see https://developers.asana.com/docs/create-a-task
+     *
      * @param projectID id of the board the card should be created on
      * @param values array containing information about the event created
      */
@@ -202,13 +204,15 @@ class AsanaApiClient
             ],
         ];
 
+        // @see https://developers.asana.com/docs/create-a-task
         $response = $this->post($url, $options);
 
         if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
             $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-            $this->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
+            $this->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response->getContent(false)]);
         } else {
-            $this->debug('Card created yesplan_id: ', ['yesplan_id' => $this->options['yesplan_id']]);
+            $this->debug('Card created yesplan_id: {yesplan_id}', ['yesplan_id' => $this->options['yesplan_id']]);
+            // @todo Store card in database.
         }
     }
 
@@ -284,9 +288,9 @@ class AsanaApiClient
 
             if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
                 $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-                $this->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
+                $this->error('Card with not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
             } else {
-                $this->debug('Card created yesplan_id: ', ['yesplan_id' => $this->options['yesplan_id']]);
+                $this->debug('Card created yesplan_id: {yesplan_id}', ['yesplan_id' => $this->options['yesplan_id']]);
             }
         }
     }
