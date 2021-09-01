@@ -155,7 +155,6 @@ class AsanaEventManager
                     $yesplanevent->setEventDateUpdated(false);
                     $yesplanevent->setInPresaleDateUpdated(false);
                     $yesplanevent->setIsNewEvent(false);
-                    $this->entityManager->persist($yesplanevent);
                 }
         }
         $this->entityManager->persist($card);
