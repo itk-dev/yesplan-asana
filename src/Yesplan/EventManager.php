@@ -57,10 +57,10 @@ class EventManager
                 if (!empty($data['ticketinfo_sale']) && $event->getInSaleDate() !== $this->getDateTime($data['ticketinfo_sale'])) {
                     $event->setInSaleDateUpdated(true);
                 }
-                if (!empty($data['presale_date']) && $event->getInSaleDate() !== $this->getDateTime($data['presale_date'])) {
+                if (!empty($data['presale_date']) && $event->getPresaleDate() !== $this->getDateTime($data['presale_date'])) {
                     $event->setInPresaleDateUpdated(true);
                 }
-                if (!empty($data['eventDate']) && $event->getInSaleDate() !== $this->getDateTime($data['eventDate'])) {
+                if (!empty($data['eventDate']) && $event->getEventDate() !== $this->getDateTime($data['eventDate'])) {
                     $event->setEventDateUpdated(true);
                 }
             }
