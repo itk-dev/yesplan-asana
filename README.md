@@ -37,6 +37,9 @@ ProfleID of different event profiles in Yesplan (used for sorting and filtering 
 StatusID of the status needed imported (only events with this statusID will be imported)
 * YESPLAN_STATUSID=''
 
+LocationIDs of the locations needed to imported (ID's in commaseperated list).
+YESPLAN_LOCATIONIDS=''
+
 Get the Asana Bearer from authorized Asana app. The Asana URL should probably be this: https://app.asana.com/api/1.0/tasks
 * ASANA_BEARER=''
 * ASANA_URL=''
