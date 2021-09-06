@@ -53,14 +53,15 @@ class EventManager
             }
             //event already exists in database
             else {
-                //if any eventdates have been updated this will be set in the database for use by the celendar integration
-                if (!empty($data['ticketinfo_sale']) && $event->getInSaleDate() !== $this->getDateTime($data['ticketinfo_sale'])) {
+                // If any event datetimes have been updated this will be set in the database for use by the calendar integration.
+                // Checking if two DateTimes are equal uses https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.spaceship-op.
+                if (!empty($data['ticketinfo_sale']) && 0 !== ($event->getInSaleDate() <=> $this->getDateTime($data['ticketinfo_sale']))) {
                     $event->setInSaleDateUpdated(true);
                 }
-                if (!empty($data['presale_date']) && $event->getPresaleDate() !== $this->getDateTime($data['presale_date'])) {
+                if (!empty($data['presale_date']) && 0 !== ($event->getPresaleDate() <=> $this->getDateTime($data['presale_date']))) {
                     $event->setInPresaleDateUpdated(true);
                 }
-                if (!empty($data['eventDate']) && $event->getEventDate() !== $this->getDateTime($data['eventDate'])) {
+                if (!empty($data['eventDate']) && 0 !== ($event->getEventDate() <=> $this->getDateTime($data['eventDate']))) {
                     $event->setEventDateUpdated(true);
                 }
             }
@@ -134,15 +135,12 @@ class EventManager
      */
     private function getDateTime(string $dateTimeString)
     {
-        $dateTime = DateTime::createFromFormat('Y-m-d+', $dateTimeString);
-        if (!$dateTime) {
-            $dateTime = DateTime::createFromFormat('G:i', $dateTimeString);
-        }
-        if (!$dateTime) {
-            $this->error('DateConversion failed {date}', ['date' => $dateTimeString, 'formatError' => DateTime::getLastErrors()]);
-            $dateTime = null;
+        try {
+            return new DateTime($dateTimeString);
+        } catch (\Exception $exception) {
+            $this->error('DateConversion failed {date}; {message}', ['date' => $dateTimeString, 'message' => $exception->getMessage()]);
         }
 
-        return $dateTime;
+        return null;
     }
 }
