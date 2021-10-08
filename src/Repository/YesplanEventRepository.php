@@ -187,10 +187,13 @@ LEFT JOIN asana_event a ON y.id=a.id
            OR y.in_sale_date_updated = 1
            OR y.in_presale_date_updated = 1
            OR y.event_date_updated = 1)
-      AND y.profile_id = :profileId
+      AND y.profile_id IN (:internalProfileId, :externalProfileId)
             ';
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['profileId' => $this->options['yesplan_intern_profile_id']]);
+        $stmt->executeQuery([
+            'internalProfileId' => $this->options['yesplan_intern_profile_id'],
+            'externalProfileId' => $this->options['yesplan_external_profile_id'],
+        ]);
 
         return $stmt->fetchAll();
     }
