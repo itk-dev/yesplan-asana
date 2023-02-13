@@ -1,4 +1,5 @@
 # Yesplan-asana
+
 Yesplan-asana is a project for copying eventinformation from Yesplan and Asana. It has been developed as a tool for a marketing department, to make sure that all event are advetised correctly. It is making use of customfields in both Yesplan and Asana.The custominformation used in Yesplan is used for filtering events, to make sure only the events that needs to be advitised is copied and created as cards on Asana.
 Tasks are also added to a calendar board to get an overview of future and current event, when they go in presal, sale and is actually held. When presale, insale or event dates are changed in yesplan, a new card will show up in Asana. It is a manual process to delete the old one.
 We have created 5 different event "filters":
@@ -11,7 +12,7 @@ Profile = Internal events:
 
 Profile = External and free events:
   * 'EventsExtern': is defined as events with productionOnline from Yesplan = 1
-  
+
 We only filter on events with the status = I salg/offentliggjort.
 
 ## Installation
@@ -23,6 +24,7 @@ docker-compose exec phpfpm bin/console doctrine:migrations:migrate --no-interact
 ```
 
 ## Environment variables
+
 To make the project integration with Yesplan and Asana, some environment variables need to be configured:
 
 Get Yesplan apikey from yesplan, yesplan URL should be somthing like this: https://XXXX.yesplan.be/
@@ -39,6 +41,9 @@ StatusID of the status needed imported (only events with this statusID will be i
 
 LocationIDs of the locations needed to imported (ID's in commaseperated list).
 YESPLAN_LOCATIONIDS=''
+
+Set this to `false` in `.env.local` for production.
+* ASANA_CLIENT_DRY_RUN=false
 
 Get the Asana Bearer from authorized Asana app. The Asana URL should probably be this: https://app.asana.com/api/1.0/tasks
 * ASANA_BEARER=''
@@ -75,7 +80,7 @@ ASANA_CALENDAR_COLOR_FIELD_YELLOW=''
 This should contain SMTP address for error mail sending
 * MAILER_DSN=smtp://localhost
 
-Information on who should receive error mails (to), email address this is sent from, and a prefix for the email subject, could be "dev", "production" or whatever you like. 
+Information on who should receive error mails (to), email address this is sent from, and a prefix for the email subject, could be "dev", "production" or whatever you like.
 * MAIL_TO=''
 * MAIL_PREFIX=''
 * MAIL_FROM=''
