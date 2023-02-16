@@ -2,7 +2,7 @@
 # Files in the packages/ subdirectory configure your dependencies.
 
 # Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
 
 services:
@@ -10,15 +10,57 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            # $yesplanApiClientOptions:
+            #     url: '%env(YESPLAN_URL)%'
+            #     apikey: '%env(YESPLAN_APIKEY)%'
+            #     status_id: '%env(YESPLAN_STATUSID)%'
+            #     location_ids: '%env(YESPLAN_LOCATIONIDS)%'
+            # $asanaApiClientOptions:
+            #     bearer: '%env(ASANA_BEARER)%'
+            #     asana_url: '%env(ASANA_URL)%'
+            #     asana_new_event: '%env(ASANA_NEW_EVENT)%'
+            #     asana_new_event_online: '%env(ASANA_NEW_EVENT_ONLINE)%'
+            #     asana_last_minute: '%env(ASANA_LAST_MINUTE)%'
+            #     asana_few_tickets: '%env(ASANA_FEW_TICKETS)%'
+            #     asana_external_event: '%env(ASANA_EXTERNAL_EVENT)%'
+            #     yesplan_eventDate: '%env(YESPLAN_EVENTDATE_FIELD)%'
+            #     yesplan_location: '%env(YESPLAN_LOCATION_FIELD)%'
+            #     yesplan_genre: '%env(YESPLAN_GENRE_FIELD)%'
+            #     yesplan_marketingBudget: '%env(YESPLAN_MARKETINGBUDGET_FIELD)%'
+            #     yesplan_publicationDate: '%env(YESPLAN_PUBLICATIONDATE_FIELD)%'
+            #     yesplan_presaleDate: '%env(YESPLAN_PRESALEDATE_FIELD)%'
+            #     yesplan_insaleDate: '%env(YESPLAN_INSALEDATE_FIELD)%'
+            #     yesplan_percent: '%env(YESPLAN_PERCENT_FIELD)%'
+            #     yesplan_profile: '%env(YESPLAN_PROFILE_FIELD)%'
+            #     yesplan_status: '%env(YESPLAN_STATUS_FIELD)%'
+            #     yesplan_id: '%env(YESPLAN_ID_FIELD)%'
+            #     asana_calendar: '%env(ASANA_CALENDAR)%'
+            #     asana_calendar_colorfield: '%env(ASANA_CALENDAR_COLOR_FIELD)%'
+            #     asana_calendar_colorfield_red: '%env(ASANA_CALENDAR_COLOR_FIELD_RED)%'
+            #     asana_calendar_colorfield_green: '%env(ASANA_CALENDAR_COLOR_FIELD_GREEN)%'
+            #     asana_calendar_colorfield_yellow: '%env(ASANA_CALENDAR_COLOR_FIELD_YELLOW)%'
+            #     dry-run: '%env(bool:ASANA_CLIENT_DRY_RUN)%'
+            $mailerOptions:
+                mail_to: '%env(MAIL_TO)%'
+                mail_prefix: '%env(MAIL_PREFIX)%'
+                mail_from: '%env(MAIL_FROM)%'
+            # $yesplanEventRepositoryOptions  :
+            #     yesplan_intern_profile_id: '%env(YESPLAN_INTERN_PROFILEID)%'
+            #     yesplan_external_profile_id: '%env(YESPLAN_EXTERNAL_PROFILEID)%'
+            #     yesplan_free_profile_id: '%env(YESPLAN_FREE_PROFILEID)%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
