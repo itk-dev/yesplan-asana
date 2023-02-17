@@ -104,7 +104,7 @@ class YesplanEvent
     #[ORM\Column]
     private ?bool $isNewEvent = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }

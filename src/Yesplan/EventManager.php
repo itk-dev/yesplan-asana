@@ -125,6 +125,7 @@ class EventManager
         $events = $this->eventRepository->findOldEvents();
 
         foreach ($events as $event) {
+            $this->info('Deleted Event:' . $event->getId());
             $this->entityManager->remove($event);
         }
         $this->entityManager->flush();

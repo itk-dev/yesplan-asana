@@ -49,7 +49,7 @@ class AsanaEvent
     #[ORM\Column(nullable: true)]
     private ?bool $createdInCalendar = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
