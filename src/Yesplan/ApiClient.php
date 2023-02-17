@@ -14,6 +14,7 @@ use DateTime;
 use DateInterval;
 use App\Traits\LoggerTrait;
 use Psr\Log\LoggerInterface;
+use App\Controller\MailerController;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\Options;

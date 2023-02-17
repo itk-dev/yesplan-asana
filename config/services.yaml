@@ -11,11 +11,11 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
-            # $yesplanApiClientOptions:
-            #     url: '%env(YESPLAN_URL)%'
-            #     apikey: '%env(YESPLAN_APIKEY)%'
-            #     status_id: '%env(YESPLAN_STATUSID)%'
-            #     location_ids: '%env(YESPLAN_LOCATIONIDS)%'
+            $yesplanApiClientOptions:
+                url: '%env(YESPLAN_URL)%'
+                apikey: '%env(YESPLAN_APIKEY)%'
+                status_id: '%env(YESPLAN_STATUSID)%'
+                location_ids: '%env(YESPLAN_LOCATIONIDS)%'
             # $asanaApiClientOptions:
             #     bearer: '%env(ASANA_BEARER)%'
             #     asana_url: '%env(ASANA_URL)%'
