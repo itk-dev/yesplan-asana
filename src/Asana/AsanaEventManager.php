@@ -13,11 +13,11 @@ namespace App\Asana;
 use App\Entity\AsanaEvent;
 use App\Entity\YesplanEvent;
 use App\Repository\AsanaEventRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\YesplanEventRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
-class AsanaEventManager{
-
+class AsanaEventManager
+{
     private const LAST_MINUTE = 'LastMinute';
     private const FEW_TICKETS = 'FewTickets';
     private const EVENTS_ONLINE = 'EventsOnline';
@@ -43,7 +43,7 @@ class AsanaEventManager{
      */
     public function createCards(): void
     {
-        //get Yesplan events for the different boards/card types
+        // get Yesplan events for the different boards/card types
         $lastMinutEvents = $this->eventRepository->findLastMinutTickets();
         $fewTicketEvents = $this->eventRepository->findFewTickets();
         $eventsOnlineEvents = $this->eventRepository->findNewEventOnlineEvents();
@@ -51,7 +51,7 @@ class AsanaEventManager{
         $eventsNewEventsExternal = $this->eventRepository->findNewProductionOnlineIncludingGratisandExternEvents();
         $calendarEvents = $this->eventRepository->findCalendarEvents();
 
-        //create the cards, and update asanaEvent table
+        // create the cards, and update asanaEvent table
         foreach ($lastMinutEvents as $lastMinuteEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
             $this->asanaApiClient->createCardLastMinute($eventData);
@@ -161,6 +161,4 @@ class AsanaEventManager{
 
         $this->entityManager->flush();
     }
-
-
 }

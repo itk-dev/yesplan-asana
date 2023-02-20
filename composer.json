@@ -10,6 +10,7 @@
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.14",
+        "friendsofphp/php-cs-fixer": "^3.14",
         "gedmo/doctrine-extensions": "^3.11",
         "stof/doctrine-extensions-bundle": "^1.7",
         "symfony/console": "6.2.*",
@@ -60,6 +61,18 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "coding-standards-check/php-cs-fixer": [
+            "php-cs-fixer --config=.php-cs-fixer.dist.php fix --dry-run"
+        ],
+        "coding-standards-check": [
+            "@coding-standards-check/php-cs-fixer"
+        ],
+        "coding-standards-apply/php-cs-fixer": [
+            "php-cs-fixer --config=.php-cs-fixer.dist.php fix"
+        ],
+        "coding-standards-apply": [
+            "@coding-standards-apply/php-cs-fixer"
         ]
     },
     "conflict": {

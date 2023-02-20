@@ -10,34 +10,35 @@
 
 namespace App\Asana;
 
+use App\Contracts\HttpClient\AsanaMockResponse;
+use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
 use Psr\Log\LoggerInterface;
-use App\Controller\MailerController;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\Options;
-use App\Contracts\HttpClient\AsanaMockResponse;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class AsanaApiClient{
-use LoggerTrait;
+class AsanaApiClient
+{
+    use LoggerTrait;
 
-private $options;
-private $mailer;
+    private $options;
+    private $mailer;
 
-/** @var HttpClientInterface */
-private $httpClient;
-private const DATETIME_FORMAT = 'Y-m-d H:i:s';
+    /** @var HttpClientInterface */
+    private $httpClient;
+    private const DATETIME_FORMAT = 'Y-m-d H:i:s';
 
     public function __construct(array $asanaApiClientOptions, MailerController $mailer, LoggerInterface $logger)
     {
-    $resolver = new OptionsResolver();
-    $this->configureOptions($resolver);
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
 
-    $this->options = $resolver->resolve($asanaApiClientOptions);
-    $this->mailer = $mailer;
-    $this->setLogger($logger);
+        $this->options = $resolver->resolve($asanaApiClientOptions);
+        $this->mailer = $mailer;
+        $this->setLogger($logger);
     }
 
     public function post(string $path, array $options): ResponseInterface
@@ -142,7 +143,7 @@ private const DATETIME_FORMAT = 'Y-m-d H:i:s';
         }
     }
 
-      /**
+    /**
      * Create cards on the boards in env var ASANA_LAST_MINUTE, and prefix the card name with "Last Minute ".
      */
     public function createCardLastMinute(array $values): void
@@ -188,17 +189,17 @@ private const DATETIME_FORMAT = 'Y-m-d H:i:s';
         $options = [
             'body' => [
                 'name' => $values['title'],
-                'custom_fields'.'['.$this->options['yesplan_id'].']' => $values['id'],
-                'custom_fields'.'['.$this->options['yesplan_eventDate'].']' => $eventDate,
-                'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],
-                'custom_fields'.'['.$this->options['yesplan_genre'].']' => $values['genre'],
-                'custom_fields'.'['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
-                'custom_fields'.'['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
-                'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
-                'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
-                'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
-                'custom_fields'.'['.$this->options['yesplan_status'].']' => $values['status'],
-                'custom_fields'.'['.$this->options['yesplan_profile'].']' => $values['profile'],
+                'custom_fields['.$this->options['yesplan_id'].']' => $values['id'],
+                'custom_fields['.$this->options['yesplan_eventDate'].']' => $eventDate,
+                'custom_fields['.$this->options['yesplan_location'].']' => $values['location'],
+                'custom_fields['.$this->options['yesplan_genre'].']' => $values['genre'],
+                'custom_fields['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
+                'custom_fields['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
+                'custom_fields['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
+                'custom_fields['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
+                'custom_fields['.$this->options['yesplan_percent'].']' => $values['percent'],
+                'custom_fields['.$this->options['yesplan_status'].']' => $values['status'],
+                'custom_fields['.$this->options['yesplan_profile'].']' => $values['profile'],
                 'projects' => $projectId,
             ],
         ];
@@ -233,15 +234,15 @@ private const DATETIME_FORMAT = 'Y-m-d H:i:s';
         $isNewEvent = $values['isNewEvent'];
 
         if ($eventDateUpdated || $isNewEvent) {
-            //create green cards in calendar on event date
+            // create green cards in calendar on event date
             $this->createCardWithColorCode($eventDate, $this->options['asana_calendar_colorfield_green'], $values, $projectId);
         }
         if ($insaleDateUpdated || $isNewEvent) {
-            //create yellow cards in calendar on insale date
+            // create yellow cards in calendar on insale date
             $this->createCardWithColorCode($insaleDate, $this->options['asana_calendar_colorfield_yellow'], $values, $projectId);
         }
         if ($inPresaleDateUpdated || $isNewEvent) {
-            //create red cards in calendar on presale date
+            // create red cards in calendar on presale date
             $this->createCardWithColorCode($presaleDate, $this->options['asana_calendar_colorfield_red'], $values, $projectId);
         }
     }
@@ -267,18 +268,18 @@ private const DATETIME_FORMAT = 'Y-m-d H:i:s';
             'body' => [
                 'name' => $values['title'],
                 'due_on' => $dueDate,
-                'custom_fields'.'['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
-                'custom_fields'.'['.$this->options['yesplan_id'].']' => $values['id'],
-                'custom_fields'.'['.$this->options['yesplan_eventDate'].']' => $eventDate,
-                'custom_fields'.'['.$this->options['yesplan_location'].']' => $values['location'],
-                'custom_fields'.'['.$this->options['yesplan_genre'].']' => $values['genre'],
-                'custom_fields'.'['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
-                'custom_fields'.'['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
-                'custom_fields'.'['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
-                'custom_fields'.'['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
-                'custom_fields'.'['.$this->options['yesplan_percent'].']' => $values['percent'],
-                'custom_fields'.'['.$this->options['yesplan_status'].']' => $values['status'],
-                'custom_fields'.'['.$this->options['yesplan_profile'].']' => $values['profile'],
+                'custom_fields['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
+                'custom_fields['.$this->options['yesplan_id'].']' => $values['id'],
+                'custom_fields['.$this->options['yesplan_eventDate'].']' => $eventDate,
+                'custom_fields['.$this->options['yesplan_location'].']' => $values['location'],
+                'custom_fields['.$this->options['yesplan_genre'].']' => $values['genre'],
+                'custom_fields['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
+                'custom_fields['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
+                'custom_fields['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
+                'custom_fields['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
+                'custom_fields['.$this->options['yesplan_percent'].']' => $values['percent'],
+                'custom_fields['.$this->options['yesplan_status'].']' => $values['status'],
+                'custom_fields['.$this->options['yesplan_profile'].']' => $values['profile'],
                 'projects' => $projectId,
             ],
         ];
@@ -293,7 +294,4 @@ private const DATETIME_FORMAT = 'Y-m-d H:i:s';
             }
         }
     }
-
-
-
 }

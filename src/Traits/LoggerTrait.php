@@ -8,21 +8,20 @@
  * This source file is subject to the MIT license.
  */
 
- namespace App\Traits;
+namespace App\Traits;
 
- use Psr\Log\LoggerAwareTrait;
- use Psr\Log\LoggerTrait as BaseLoggerTrait;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerTrait as BaseLoggerTrait;
 
- trait LoggerTrait
- {
-   use BaseLoggerTrait;
-   use LoggerAwareTrait;
+trait LoggerTrait
+{
+    use BaseLoggerTrait;
+    use LoggerAwareTrait;
 
-   public function log($level, string|\Stringable $message, array $context = []): void
-   {
-       if (null !== $this->logger) {
-           $this->logger->log($level, $message, $context);
-       }
-   }
-
- }
+    public function log($level, string|\Stringable $message, array $context = []): void
+    {
+        if (null !== $this->logger) {
+            $this->logger->log($level, $message, $context);
+        }
+    }
+}

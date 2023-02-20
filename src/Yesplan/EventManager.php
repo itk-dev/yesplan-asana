@@ -10,12 +10,12 @@
 
 namespace App\Yesplan;
 
-use DateTime;
-use App\Traits\LoggerTrait;
 use App\Entity\YesplanEvent;
-use Psr\Log\LoggerInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\YesplanEventRepository;
+use App\Traits\LoggerTrait;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class EventManager
 {
@@ -45,13 +45,13 @@ class EventManager
         foreach ($events as $data) {
             $eventid = $data['id'];
             $event = $this->eventRepository->find($eventid);
-            //event does not exist in database
+            // event does not exist in database
             if (null === $event) {
                 $event = new YesplanEvent();
                 $event->setId($eventid);
                 $event->setIsNewEvent(true);
             }
-            //event already exists in database
+            // event already exists in database
             else {
                 // If any event datetimes have been updated this will be set in the database for use by the calendar integration.
                 // Checking if two DateTimes are equal uses https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.spaceship-op.
@@ -86,27 +86,27 @@ class EventManager
 
             $capacityPercentage = 0;
 
-            //(tixintegrations_ticketsavailable + tixintegrations_ticketsreserved) / (tixintegrations_capacity - tixintegrations_blocked - tixintegrations_allocated) * 100
+            // (tixintegrations_ticketsavailable + tixintegrations_ticketsreserved) / (tixintegrations_capacity - tixintegrations_blocked - tixintegrations_allocated) * 100
             if ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated() > 0) {
                 $capacityPercentage = 100 - ($event->getTicketsAvailable() + $event->getTicketsReserved()) / ($event->getTicketCapacity() - $event->getTicketsBlocked() - $event->getTicketsAllocated()) * 100;
             }
             $event->setCapacityPercent($capacityPercentage);
 
-            //if date is not empty convert to datetime before setting the value
+            // if date is not empty convert to datetime before setting the value
             if (!empty($data['publication_date'])) {
                 $event->setPublicationDate($this->getDateTime($data['publication_date']));
             }
-            //if date is not empty convert to datetime before setting the value
+            // if date is not empty convert to datetime before setting the value
             if (!empty($data['presale_date'])) {
                 $event->setPresaleDate($this->getDateTime($data['presale_date']));
             }
 
-            //if date is not empty convert to datetime before setting the value
+            // if date is not empty convert to datetime before setting the value
             if (!empty($data['ticketinfo_sale'])) {
                 $event->setInSaleDate($this->getDateTime($data['ticketinfo_sale']));
             }
 
-            //if date is not empty convert to datetime before setting the value
+            // if date is not empty convert to datetime before setting the value
             if (!empty($data['eventDate'])) {
                 $event->setEventDate($this->getDateTime($data['eventDate']));
             }
@@ -125,7 +125,7 @@ class EventManager
         $events = $this->eventRepository->findOldEvents();
 
         foreach ($events as $event) {
-            $this->info('Deleted Event:' . $event->getId());
+            $this->info('Deleted Event:'.$event->getId());
             $this->entityManager->remove($event);
         }
         $this->entityManager->flush();
@@ -137,12 +137,11 @@ class EventManager
     private function getDateTime(string $dateTimeString)
     {
         try {
-            return new DateTime($dateTimeString);
+            return new \DateTime($dateTimeString);
         } catch (\Exception $exception) {
             $this->error('DateConversion failed {date}; {message}', ['date' => $dateTimeString, 'message' => $exception->getMessage()]);
         }
 
         return null;
     }
-
 }

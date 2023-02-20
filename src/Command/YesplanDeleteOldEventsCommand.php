@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Command;
 
 use App\Yesplan\EventManager;
@@ -30,5 +31,4 @@ class YesplanDeleteOldEventsCommand extends Command
 
         return 0;
     }
-
 }

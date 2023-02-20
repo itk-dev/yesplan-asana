@@ -7,6 +7,7 @@
  *
  * This source file is subject to the MIT license.
  */
+
 namespace App\Command;
 
 use App\Asana\AsanaEventManager;
@@ -14,9 +15,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 class AsanaPutCardsCommand extends Command
- {
+{
     protected static $defaultName = 'app:asana:create-cards';
 
     private $asanaEventManager;
@@ -40,4 +40,4 @@ class AsanaPutCardsCommand extends Command
 
         return 0;
     }
- }
+}

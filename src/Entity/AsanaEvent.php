@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Repository\AsanaEventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\AsanaEventRepository;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: AsanaEventRepository::class)]
@@ -12,14 +12,12 @@ class AsanaEvent
 {
     /**
      * Hook timestampable behavior
-     * updates createdAt, updatedAt fields
+     * updates createdAt, updatedAt fields.
      */
     use TimestampableEntity;
 
-
-
     #[ORM\Id]
-    #[ORM\Column(length:255)]
+    #[ORM\Column(length: 255)]
     private ?string $id;
 
     #[ORM\Column(nullable: true)]

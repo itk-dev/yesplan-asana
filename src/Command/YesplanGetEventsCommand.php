@@ -40,5 +40,4 @@ class YesplanGetEventsCommand extends Command
 
         return 0;
     }
-
 }

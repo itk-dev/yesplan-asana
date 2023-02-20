@@ -10,23 +10,22 @@
 
 namespace App\Entity;
 
+use App\Repository\YesplanEventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\YesplanEventRepository;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: YesplanEventRepository::class)]
 class YesplanEvent
 {
-
-  /*
-     * Hook timestampable behavior
-     * updates createdAt, updatedAt fields
-     */
+    /*
+       * Hook timestampable behavior
+       * updates createdAt, updatedAt fields
+       */
     use TimestampableEntity;
 
     #[ORM\Id]
-    #[ORM\Column(length:255)]
+    #[ORM\Column(length: 255)]
     private ?string $id;
 
     #[ORM\Column]
@@ -127,8 +126,6 @@ class YesplanEvent
 
         return $this;
     }
-
-
 
     public function getTitle(): ?string
     {
@@ -437,5 +434,4 @@ class YesplanEvent
     {
         return $this->isNewEvent;
     }
-
 }
