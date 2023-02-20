@@ -109,6 +109,13 @@ class YesplanEvent
         return $this->id;
     }
 
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getData(): array
     {
         return $this->data;
@@ -121,12 +128,7 @@ class YesplanEvent
         return $this;
     }
 
-    public function setId(string $id): self
-    {
-        $this->id = $id;
 
-        return $this;
-    }
 
     public function getTitle(): ?string
     {
@@ -415,4 +417,25 @@ class YesplanEvent
 
         return $this;
     }
+
+    public function getInSaleDateUpdated(): ?bool
+    {
+        return $this->inSaleDateUpdated;
+    }
+
+    public function getInPresaleDateUpdated(): ?bool
+    {
+        return $this->inPresaleDateUpdated;
+    }
+
+    public function getEventDateUpdated(): ?bool
+    {
+        return $this->eventDateUpdated;
+    }
+
+    public function getIsNewEvent(): ?bool
+    {
+        return $this->isNewEvent;
+    }
+
 }

@@ -79,10 +79,10 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-            FROM yesplan_event y
-            LEFT JOIN asana_event a ON y.id=a.id
-            WHERE y.production_online = true AND  (a.created_in_new_events is null OR a.created_in_new_events = 0)
-            AND y.profile_id = :profileIdIntern
+            FROM App\Entity\YesplanEvent y
+            LEFT JOIN App\Entity\AsanaEvent a WITH y.id=a.id
+            WHERE y.productionOnline = true AND  (a.createdInNewEvents is null OR a.createdInNewEvents = 0)
+            AND y.profileId = :profileIdIntern
             '
         )->setParameter('profileIdIntern', $this->options['yesplan_intern_profile_id']);
         // returns an array of event id's
@@ -104,15 +104,17 @@ class YesplanEventRepository extends ServiceEntityRepository
 
 
         $query = $entityManager->createQuery(
-            'SELECT y.id
-             FROM yesplan_event y
-             LEFT JOIN asana_event a ON y.id=a.id
-             WHERE y.production_online = true
-             AND  (a.created_in_new_events_external is null OR a.created_in_new_events_external = 0)
-             AND (a.created_in_new_events is null OR a.created_in_new_events = 0)
-             AND (y.profile_id = :profileIdEkstern OR y.profile_id = :profileIdGratis)
-            '
-        )->setParameters(['profileIdEkstern' , $this->options['yesplan_external_profile_id'], 'profileIdGratis' , $this->options['yesplan_free_profile_id']]);
+              'SELECT y.id
+               FROM App\Entity\YesplanEvent y
+               LEFT JOIN App\Entity\AsanaEvent a
+               WHERE y.productionOnline = true
+               AND  (a.createdInNewEvents is null OR a.createdInNewEvents = 0)
+               AND (a.createdInNewEvents is null OR a.createdInNewEvents = 0)
+               AND (y.profileId = :profileIdEkstern OR y.profileId = :profileIdGratis)
+              '
+
+
+        )->setParameters(['profileIdEkstern' => $this->options['yesplan_external_profile_id'], 'profileIdGratis' => $this->options['yesplan_free_profile_id']]);
         // returns an array of event id's
         return $query->getResult();
 
@@ -130,11 +132,13 @@ class YesplanEventRepository extends ServiceEntityRepository
 
 
         $query = $entityManager->createQuery(
-            'SELECT y.id FROM yesplan_event y
-            LEFT JOIN asana_event a ON y.id=a.id
-            WHERE y.event_online = true
-            AND (a.created_in_new_events_online is null OR a.created_in_new_events_online = 0)
-            AND y.profile_id = :profileId
+            'SELECT y.id
+            FROM App\Entity\YesplanEvent y
+            LEFT JOIN App\Entity\AsanaEvent a
+            WITH y.id=a.id
+            WHERE y.eventOnline = true
+            AND (a.createdInNewEventsOnline is null OR a.createdInNewEventsOnline = 0)
+            AND y.profileId = :profileId
             '
         )->setParameter('profileId', $this->options['yesplan_intern_profile_id']);
         // returns an array of event id's
@@ -159,12 +163,12 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-            FROM yesplan_event y
-            LEFT JOIN asana_event a ON y.id=a.id
-            WHERE y.capacity_percent >= 90
-            AND  (a.created_in_few_tickets is null OR a.created_in_few_tickets = 0)
-            AND y.profile_id = :profileId
-
+            FROM App\Entity\YesplanEvent y
+            LEFT JOIN App\Entity\AsanaEvent a
+            WITH y.id=a.id
+            WHERE y.capacityPercent >= 90
+            AND  (a.createdInFewTickets is null OR a.createdInFewTickets = 0)
+            AND y.profileId = :profileId
             '
         )->setParameter('profileId' , $this->options['yesplan_intern_profile_id']);
         // returns an array of event id's
@@ -177,7 +181,6 @@ class YesplanEventRepository extends ServiceEntityRepository
      * Finds all events with less than 75% tickets sold less than 3 weeks before the event
      * == more than 25% tickets left 3 weeks before event.
      *
-     * @return YesplanEvent[]
      */
     public function findLastMinutTickets(): array
     {
@@ -188,14 +191,16 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-            FROM yesplan_event y
-            LEFT JOIN asana_event a ON y.id=a.id
-            WHERE y.capacity_percent <= 75
-            AND  (a.created_in_last_minute is null OR a.created_in_last_minute = 0)
-            AND y.event_date <= :nowPlus3Weeks
-            AND y.profile_id = :profileId
+                FROM App\Entity\YesplanEvent y
+                LEFT JOIN App\Entity\AsanaEvent a
+                WITH y.id=a.id
+                WHERE y.capacityPercent <= 75
+                AND  (a.createdInLastMinute is null OR a.createdInLastMinute = 0)
+                AND y.eventDate <= :nowPlus3Weeks
+                AND y.profileId = :profileId
+
             '
-        )->setParameters(['nowPlus3Weeks' , date_format($nowPlus3Weeks, 'Y-m-d H:i:s'), 'profileId' , $this->options['yesplan_intern_profile_id']]);
+        )->setParameters(['nowPlus3Weeks' => date_format($nowPlus3Weeks, 'Y-m-d H:i:s'), 'profileId' => $this->options['yesplan_intern_profile_id']]);
         // returns an array of event id's
         return $query->getResult();
 
@@ -213,12 +218,13 @@ class YesplanEventRepository extends ServiceEntityRepository
         $query = $entityManager->createQuery(
             'SELECT y.id
             FROM yesplan_event y
-       LEFT JOIN asana_event a ON y.id=a.id
+            LEFT JOIN asana_event a
+            WITH y.id=a.id
            WHERE ((a.created_in_calendar is null OR a.created_in_calendar = 0)
                   OR y.in_sale_date_updated = 1
                   OR y.in_presale_date_updated = 1
                   OR y.event_date_updated = 1)
-             AND y.profile_id = :profileId
+             AND y.profileId = :profileId
             '
         )->setParameter('profileId' , $this->options['yesplan_intern_profile_id']);
         // returns an array of event id's
