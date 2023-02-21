@@ -8,6 +8,9 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "gedmo/doctrine-extensions": "^3.11",
+        "doctrine/doctrine-bundle": "^2.8",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.14",
         "stof/doctrine-extensions-bundle": "^1.7",
         "symfony/console": "6.2.*",
         "symfony/dotenv": "6.2.*",
@@ -82,9 +85,6 @@
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.48",
-        "doctrine/doctrine-bundle": "^2.8",
-        "doctrine/doctrine-migrations-bundle": "^3.2",
-        "doctrine/orm": "^2.14",
         "friendsofphp/php-cs-fixer": "^3.14"
     }
 }
