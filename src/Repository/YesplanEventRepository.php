@@ -64,13 +64,13 @@ class YesplanEventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Finds all event ids with productionOnline = false and profile only internal events.
+     * Finds all event id's with productionOnline = false and profile only internal events.
      *
      * @return array[]
      */
     public function findNewProductionOnlineEvents(): array
     {
-        // get all events with productiononline = 1 not already created in Asana
+        // get all events id's with productiononline = false not already created in Asana
         // returns an array of event id's
         $entityManager = $this->getEntityManager();
 
@@ -87,14 +87,13 @@ class YesplanEventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Finds all events with ids productionOnline = 1 and profile extern, intern and free events.
+     * Finds all events with id's productionOnline = true and profile extern, intern and free events.
      *
      * @return array[]
      */
     public function findNewProductionOnlineIncludingGratisandExternEvents(): array
     {
-        // get all events with productiononline = 1 not already created in Asana
-        // returns an array of event id's
+        // get all events with productiononline = true not already created in Asana
 
         $entityManager = $this->getEntityManager();
 
@@ -113,13 +112,13 @@ class YesplanEventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Finds all ids for events with eventOnline = true and profile only internal events.
+     * Finds all events id's with eventOnline = true and profile only internal events.
      *
      * @return array[]
      */
     public function findNewEventOnlineEvents(): array
     {
-        // get all events with eventonline = 1 not already created in Asana
+        // get all events with eventonline = true not already created in Asana
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
@@ -137,7 +136,7 @@ class YesplanEventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Finds all ids with more than 90 % tiprofileIdInternckets sold
+     * Finds all id's with more than 90 % tiprofileIdInternckets sold
      * == less than 10% tickets are left.
      *
      * @return array[]
@@ -146,7 +145,7 @@ class YesplanEventRepository extends ServiceEntityRepository
     {
         // (tixintegrations_ticketsavailable + tixintegrations_ticketsreserved) / (tixintegrations_capacity - tixintegrations_blocked - tixintegrations_allocated) * 100
         // <10%
-        // Returns all evet ids of events not already in ASANA boards for few tickets, with capacitypercent < 10%
+        // Returns all evet id's of events not already in ASANA boards for few tickets, with capacitypercent < 10%
 
         $entityManager = $this->getEntityManager();
 
@@ -165,7 +164,7 @@ class YesplanEventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Finds all ids with less than 75% tickets sold less than 3 weeks before the event
+     * Finds all id's with less than 75% tickets sold less than 3 weeks before the event
      * == more than 25% tickets left 3 weeks before event.
      */
     public function findLastMinutTickets(): array
