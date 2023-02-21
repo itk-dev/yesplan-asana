@@ -19,9 +19,9 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 class YesplanEvent
 {
     /*
-       * Hook timestampable behavior
-       * updates createdAt, updatedAt fields
-       */
+     * Hook timestampable behavior
+     * updates createdAt, updatedAt fields
+     */
     use TimestampableEntity;
 
     #[ORM\Id]

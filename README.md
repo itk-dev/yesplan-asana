@@ -11,7 +11,7 @@ Profile = Internal events:
 
 Profile = External and free events:
   * 'EventsExtern': is defined as events with productionOnline from Yesplan = 1
-  
+
 We only filter on events with the status = I salg/offentliggjort.
 
 ## Installation
@@ -75,7 +75,7 @@ ASANA_CALENDAR_COLOR_FIELD_YELLOW=''
 This should contain SMTP address for error mail sending
 * MAILER_DSN=smtp://localhost
 
-Information on who should receive error mails (to), email address this is sent from, and a prefix for the email subject, could be "dev", "production" or whatever you like. 
+Information on who should receive error mails (to), email address this is sent from, and a prefix for the email subject, could be "dev", "production" or whatever you like.
 * MAIL_TO=''
 * MAIL_PREFIX=''
 * MAIL_FROM=''

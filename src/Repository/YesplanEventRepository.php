@@ -47,26 +47,26 @@ class YesplanEventRepository extends ServiceEntityRepository
     /**
      * Returns all events older than today.
      *
-     * @return YesplanEvent[]
+     * @return array[]
      */
     public function findOldEvents(): array
     {
         $entityManager = $this->getEntityManager();
-        $timeNow = new \DateTime('NOW');
+        $timeNow = new \DateTimeImmutable('NOW');
 
         $query = $entityManager->createQuery(
             'SELECT e
-            FROM App\Entity\YesplanEvent e
-            WHERE e.eventDate < :timeNow'
+             FROM App\Entity\YesplanEvent e
+             WHERE e.eventDate < :timeNow'
         )->setParameter('timeNow', $timeNow->format('Y-m-d H:i:s:'));
         // returns an array of event id's
         return $query->getResult();
     }
 
     /**
-     * Finds all events with productionOnline = 1, and profile only internal events.
+     * Finds all event ids with productionOnline = false and profile only internal events.
      *
-     * @return YesplanEvent[]
+     * @return array[]
      */
     public function findNewProductionOnlineEvents(): array
     {
@@ -76,10 +76,10 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-            FROM App\Entity\YesplanEvent y
-            LEFT JOIN App\Entity\AsanaEvent a WITH y.id=a.id
-            WHERE y.productionOnline = true AND  (a.createdInNewEvents is null OR a.createdInNewEvents = 0)
-            AND y.profileId = :profileIdIntern
+             FROM App\Entity\YesplanEvent y
+             LEFT JOIN App\Entity\AsanaEvent a WITH y.id=a.id
+             WHERE y.productionOnline = true AND  (a.createdInNewEvents is null OR a.createdInNewEvents = false)
+             AND y.profileId = :profileIdIntern
             '
         )->setParameter('profileIdIntern', $this->options['yesplan_intern_profile_id']);
         // returns an array of event id's
@@ -87,9 +87,9 @@ class YesplanEventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Finds all events with productionOnline = 1 and profile extern, intern and free events.
+     * Finds all events with ids productionOnline = 1 and profile extern, intern and free events.
      *
-     * @return YesplanEvent[]
+     * @return array[]
      */
     public function findNewProductionOnlineIncludingGratisandExternEvents(): array
     {
@@ -100,22 +100,22 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-               FROM App\Entity\YesplanEvent y
-               LEFT JOIN App\Entity\AsanaEvent a WITH y.id=a.id
-               WHERE y.productionOnline = true
-                AND  (a.createdInNewEvents is null OR a.createdInNewEvents = 0)
-                AND (a.createdInNewEvents is null OR a.createdInNewEvents = 0)
-                AND (y.profileId = :profileIdEkstern OR y.profileId = :profileIdGratis)
-              '
+             FROM App\Entity\YesplanEvent y
+             LEFT JOIN App\Entity\AsanaEvent a WITH y.id=a.id
+             WHERE y.productionOnline = true
+             AND  (a.createdInNewEvents is null OR a.createdInNewEvents = false)
+             AND (a.createdInNewEvents is null OR a.createdInNewEvents = false)
+             AND (y.profileId = :profileIdEkstern OR y.profileId = :profileIdGratis)
+            '
         )->setParameters(['profileIdEkstern' => $this->options['yesplan_external_profile_id'], 'profileIdGratis' => $this->options['yesplan_free_profile_id']]);
         // returns an array of event id's
         return $query->getResult();
     }
 
     /**
-     * Finds all events with eventOnline = 1, and profile only internal events.
+     * Finds all ids for events with eventOnline = true and profile only internal events.
      *
-     * @return YesplanEvent[]
+     * @return array[]
      */
     public function findNewEventOnlineEvents(): array
     {
@@ -124,23 +124,23 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-            FROM App\Entity\YesplanEvent y
-            LEFT JOIN App\Entity\AsanaEvent a
-            WITH y.id=a.id
-            WHERE y.eventOnline = true
-            AND (a.createdInNewEventsOnline is null OR a.createdInNewEventsOnline = 0)
-            AND y.profileId = :profileId
+             FROM App\Entity\YesplanEvent y
+             LEFT JOIN App\Entity\AsanaEvent a
+             WITH y.id=a.id
+             WHERE y.eventOnline = true
+             AND (a.createdInNewEventsOnline is null OR a.createdInNewEventsOnline = false)
+             AND y.profileId = :profileId
             '
         )->setParameter('profileId', $this->options['yesplan_intern_profile_id']);
-        // returns an array of event id's
+
         return $query->getResult();
     }
 
     /**
-     * Finds all events with more than 90 % tiprofileIdInternckets sold
+     * Finds all ids with more than 90 % tiprofileIdInternckets sold
      * == less than 10% tickets are left.
      *
-     * @return YesplanEvent[]
+     * @return array[]
      */
     public function findFewTickets(): array
     {
@@ -152,38 +152,36 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-            FROM App\Entity\YesplanEvent y
-            LEFT JOIN App\Entity\AsanaEvent a
-            WITH y.id=a.id
-            WHERE y.capacityPercent >= 90
-            AND  (a.createdInFewTickets is null OR a.createdInFewTickets = 0)
-            AND y.profileId = :profileId
+             FROM App\Entity\YesplanEvent y
+             LEFT JOIN App\Entity\AsanaEvent a
+             WITH y.id=a.id
+             WHERE y.capacityPercent >= 90
+             AND  (a.createdInFewTickets is null OR a.createdInFewTickets = false)
+             AND y.profileId = :profileId
             '
         )->setParameter('profileId', $this->options['yesplan_intern_profile_id']);
-        // returns an array of event id's
+
         return $query->getResult();
     }
 
     /**
-     * Finds all events with less than 75% tickets sold less than 3 weeks before the event
+     * Finds all ids with less than 75% tickets sold less than 3 weeks before the event
      * == more than 25% tickets left 3 weeks before event.
      */
     public function findLastMinutTickets(): array
     {
-        $nowPlus3Weeks = new \DateTime('NOW');
-        $nowPlus3Weeks->add(new \DateInterval('P21D'));
+        $nowPlus3Weeks = new \DateTimeImmutable('+3 weeks');
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-                FROM App\Entity\YesplanEvent y
-                LEFT JOIN App\Entity\AsanaEvent a
-                WITH y.id=a.id
-                WHERE y.capacityPercent <= 75
-                AND  (a.createdInLastMinute is null OR a.createdInLastMinute = 0)
-                AND y.eventDate <= :nowPlus3Weeks
-                AND y.profileId = :profileId
-
+             FROM App\Entity\YesplanEvent y
+             LEFT JOIN App\Entity\AsanaEvent a
+             WITH y.id=a.id
+             WHERE y.capacityPercent <= 75
+             AND  (a.createdInLastMinute is null OR a.createdInLastMinute = false)
+             AND y.eventDate <= :nowPlus3Weeks
+             AND y.profileId = :profileId
             '
         )->setParameters(['nowPlus3Weeks' => date_format($nowPlus3Weeks, 'Y-m-d H:i:s'), 'profileId' => $this->options['yesplan_intern_profile_id']]);
         // returns an array of event id's
@@ -199,14 +197,14 @@ class YesplanEventRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT y.id
-                FROM App\Entity\YesplanEvent y
-                LEFT JOIN App\Entity\AsanaEvent a
-                WITH y.id=a.id
-                WHERE ((a.createdInCalendar is null OR a.createdInCalendar = 0)
-                  OR y.inSaleDateUpdated = 1
-                  OR y.inPresaleDateUpdated = 1
-                  OR y.eventDateUpdated = 1)
-             AND y.profileId = :profileId
+                 FROM App\Entity\YesplanEvent y
+                 LEFT JOIN App\Entity\AsanaEvent a
+                 WITH y.id=a.id
+                 WHERE ((a.createdInCalendar is null OR a.createdInCalendar = false)
+                  OR y.inSaleDateUpdated = true
+                  OR y.inPresaleDateUpdated = true
+                  OR y.eventDateUpdated = true)
+                 AND y.profileId = :profileId
             '
         )->setParameter('profileId', $this->options['yesplan_intern_profile_id']);
         // returns an array of event id's

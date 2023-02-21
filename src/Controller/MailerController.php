@@ -37,10 +37,6 @@ class MailerController extends AbstractController
          $email = (new Email())
          ->from($this->options['mail_from'])
          ->to($this->options['mail_to'])
-         // ->cc('cc@example.com')
-         // ->bcc('bcc@example.com')
-         // ->replyTo('fabien@example.com')
-         // ->priority(Email::PRIORITY_HIGH)
          ->subject($this->options['mail_prefix'].' '.$subject)
          ->text($message)
          ->html($message);
