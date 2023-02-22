@@ -20,7 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @method YesplanEvent|null findOneBy(array $criteria, array $orderBy = null)
  * @method YesplanEvent[]    findAll()
  * @method YesplanEvent[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method YesplanEvent[]    findNewProductionOnlineEvents()
  */
 class YesplanEventRepository extends ServiceEntityRepository
 {
@@ -101,7 +100,7 @@ class YesplanEventRepository extends ServiceEntityRepository
              FROM App\Entity\YesplanEvent y
              LEFT JOIN App\Entity\AsanaEvent a WITH y.id=a.id
              WHERE y.productionOnline = true
-             AND  (a.createdInNewEvents is null OR a.createdInNewEvents = false)
+             AND (a.createdInNewEventsExternal is null OR a.createdInNewEventsExternal = false)
              AND (a.createdInNewEvents is null OR a.createdInNewEvents = false)
              AND (y.profileId = :profileIdEkstern OR y.profileId = :profileIdGratis)
             '
