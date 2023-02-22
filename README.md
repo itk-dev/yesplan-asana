@@ -1,5 +1,4 @@
 # Yesplan-asana
-
 Yesplan-asana is a project for copying eventinformation from Yesplan and Asana. It has been developed as a tool for a marketing department, to make sure that all event are advetised correctly. It is making use of customfields in both Yesplan and Asana.The custominformation used in Yesplan is used for filtering events, to make sure only the events that needs to be advitised is copied and created as cards on Asana.
 Tasks are also added to a calendar board to get an overview of future and current event, when they go in presal, sale and is actually held. When presale, insale or event dates are changed in yesplan, a new card will show up in Asana. It is a manual process to delete the old one.
 We have created 5 different event "filters":
@@ -18,13 +17,12 @@ We only filter on events with the status = I salg/offentliggjort.
 ## Installation
 
 ```sh
-docker-compose up -d
-docker-compose exec phpfpm composer install
-docker-compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
+docker compose up -d
+docker compose exec phpfpm composer install
+docker compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
 ```
 
 ## Environment variables
-
 To make the project integration with Yesplan and Asana, some environment variables need to be configured:
 
 Get Yesplan apikey from yesplan, yesplan URL should be somthing like this: https://XXXX.yesplan.be/
@@ -41,9 +39,6 @@ StatusID of the status needed imported (only events with this statusID will be i
 
 LocationIDs of the locations needed to imported (ID's in commaseperated list).
 YESPLAN_LOCATIONIDS=''
-
-Set this to `false` in `.env.local` for production.
-* ASANA_CLIENT_DRY_RUN=false
 
 Get the Asana Bearer from authorized Asana app. The Asana URL should probably be this: https://app.asana.com/api/1.0/tasks
 * ASANA_BEARER=''
@@ -88,22 +83,22 @@ Information on who should receive error mails (to), email address this is sent f
 ## Usage
 
 ```sh
-docker-compose exec phpfpm bin/console app:yesplan:get-events
+docker compose exec phpfpm bin/console app:yesplan:get-events
 ```
 ```sh
-docker-compose exec phpfpm bin/console app:yesplan:delete-old-events
+docker compose exec phpfpm bin/console app:yesplan:delete-old-events
 ```
 
 ```sh
-docker-compose exec phpfpm bin/console app:asana:create-cards
+docker compose exec phpfpm bin/console app:asana:create-cards
 ```
 
 ## Coding standards
 
 ```sh
-docker-compose exec phpfpm composer coding-standards-check
+docker compose exec phpfpm composer coding-standards-check
 ```
 
 ```sh
-docker-compose exec phpfpm composer coding-standards-apply
+docker compose exec phpfpm composer coding-standards-apply
 ```

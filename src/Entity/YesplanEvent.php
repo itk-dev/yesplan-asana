@@ -10,12 +10,12 @@
 
 namespace App\Entity;
 
+use App\Repository\YesplanEventRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\YesplanEventRepository")
- */
+#[ORM\Entity(repositoryClass: YesplanEventRepository::class)]
 class YesplanEvent
 {
     /*
@@ -24,136 +24,84 @@ class YesplanEvent
      */
     use TimestampableEntity;
 
-    /**
-     * @ORM\Id()
-     * @ORM\Column(type="string", length=255)
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(length: 255)]
+    private ?string $id;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $data = [];
+    #[ORM\Column]
+    private array $data = [];
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $title;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $title = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $eventDate;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $eventDate = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $location;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $location = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $genre;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $genre = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $marketing_budget;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $marketing_budget = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $publication_date;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $publication_date = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $presale_date;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $presale_date = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $in_sale_date;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $in_sale_date = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $tickets_available;
+    #[ORM\Column(nullable: true)]
+    private ?int $tickets_available = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $tickets_reserved;
+    #[ORM\Column(nullable: true)]
+    private ?int $tickets_reserved = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $ticket_capacity;
+    #[ORM\Column(nullable: true)]
+    private ?int $ticket_capacity = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $tickets_blocked;
+    #[ORM\Column(nullable: true)]
+    private ?int $tickets_blocked = null;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $tickets_allocated;
+    #[ORM\Column(nullable: true)]
+    private ?int $tickets_allocated = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $productionOnline;
+    #[ORM\Column(nullable: true)]
+    private ?bool $productionOnline = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $eventOnline;
+    #[ORM\Column(nullable: true)]
+    private ?bool $eventOnline = null;
 
-    /**
-     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
-     */
-    private $capacityPercent;
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $capacityPercent = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $status;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $status = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $statusId;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $statusId = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $profile;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profile = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $profileId;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profileId = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $inSaleDateUpdated;
+    #[ORM\Column(nullable: true)]
+    private ?bool $inSaleDateUpdated = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $inPresaleDateUpdated;
+    #[ORM\Column(nullable: true)]
+    private ?bool $inPresaleDateUpdated = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $eventDateUpdated;
+    #[ORM\Column]
+    private ?bool $eventDateUpdated = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $isNewEvent;
+    #[ORM\Column]
+    private ?bool $isNewEvent = null;
 
     public function getId(): ?string
     {
@@ -167,7 +115,7 @@ class YesplanEvent
         return $this;
     }
 
-    public function getData(): ?array
+    public function getData(): array
     {
         return $this->data;
     }
@@ -335,7 +283,7 @@ class YesplanEvent
         return $this;
     }
 
-    public function getProductionOnline(): ?bool
+    public function isProductionOnline(): ?bool
     {
         return $this->productionOnline;
     }
@@ -347,7 +295,7 @@ class YesplanEvent
         return $this;
     }
 
-    public function getEventOnline(): ?bool
+    public function isEventOnline(): ?bool
     {
         return $this->eventOnline;
     }
@@ -419,7 +367,7 @@ class YesplanEvent
         return $this;
     }
 
-    public function getInSaleDateUpdated(): ?bool
+    public function isInSaleDateUpdated(): ?bool
     {
         return $this->inSaleDateUpdated;
     }
@@ -431,7 +379,7 @@ class YesplanEvent
         return $this;
     }
 
-    public function getInPresaleDateUpdated(): ?bool
+    public function isInPresaleDateUpdated(): ?bool
     {
         return $this->inPresaleDateUpdated;
     }
@@ -443,27 +391,47 @@ class YesplanEvent
         return $this;
     }
 
-    public function getEventDateUpdated(): ?bool
+    public function isEventDateUpdated(): ?bool
     {
         return $this->eventDateUpdated;
     }
 
-    public function setEventDateUpdated(?bool $eventDateUpdated): self
+    public function setEventDateUpdated(bool $eventDateUpdated): self
     {
         $this->eventDateUpdated = $eventDateUpdated;
 
         return $this;
     }
 
-    public function getIsNewEvent(): ?bool
+    public function isIsNewEvent(): ?bool
     {
         return $this->isNewEvent;
     }
 
-    public function setIsNewEvent(?bool $isNewEvent): self
+    public function setIsNewEvent(bool $isNewEvent): self
     {
         $this->isNewEvent = $isNewEvent;
 
         return $this;
+    }
+
+    public function getInSaleDateUpdated(): ?bool
+    {
+        return $this->inSaleDateUpdated;
+    }
+
+    public function getInPresaleDateUpdated(): ?bool
+    {
+        return $this->inPresaleDateUpdated;
+    }
+
+    public function getEventDateUpdated(): ?bool
+    {
+        return $this->eventDateUpdated;
+    }
+
+    public function getIsNewEvent(): ?bool
+    {
+        return $this->isNewEvent;
     }
 }

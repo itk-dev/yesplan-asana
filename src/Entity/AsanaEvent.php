@@ -1,78 +1,51 @@
 <?php
 
-/*
- * This file is part of itk-dev/yesplan-asana.
- *
- * (c) 2020 ITK Development
- *
- * This source file is subject to the MIT license.
- */
-
 namespace App\Entity;
 
+use App\Repository\AsanaEventRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\AsanaEventRepository")
- */
+#[ORM\Entity(repositoryClass: AsanaEventRepository::class)]
 class AsanaEvent
 {
-    /*
-    * Hook timestampable behavior
-    * updates createdAt, updatedAt fields
-    */
+    /**
+     * Hook timestampable behavior
+     * updates createdAt, updatedAt fields.
+     */
     use TimestampableEntity;
-    /**
-     * @ORM\Id()
-     * @ORM\Column(type="string", length=255)
-     */
-    private $id;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $createdInAsana;
+    #[ORM\Id]
+    #[ORM\Column(length: 255)]
+    private ?string $id;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $createdDate;
+    #[ORM\Column(nullable: true)]
+    private ?bool $createdInAsana = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $updatedDate;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $createdDate = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $createdInNewEvents;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedDate = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $createdInNewEventsOnline;
+    #[ORM\Column(nullable: true)]
+    private ?bool $createdInNewEvents = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $createdInFewTickets;
+    #[ORM\Column(nullable: true)]
+    private ?bool $createdInNewEventsOnline = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $createdInLastMinute;
+    #[ORM\Column(nullable: true)]
+    private ?bool $createdInFewTickets = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $createdInNewEventsExternal;
+    #[ORM\Column(nullable: true)]
+    private ?bool $createdInLastMinute = null;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $createdInCalendar;
+    #[ORM\Column(nullable: true)]
+    private ?bool $createdInNewEventsExternal = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $createdInCalendar = null;
 
     public function getId(): ?string
     {
@@ -86,7 +59,7 @@ class AsanaEvent
         return $this;
     }
 
-    public function getCreatedInAsana(): ?bool
+    public function isCreatedInAsana(): ?bool
     {
         return $this->createdInAsana;
     }
@@ -122,7 +95,7 @@ class AsanaEvent
         return $this;
     }
 
-    public function getCreatedInNewEvents(): ?bool
+    public function isCreatedInNewEvents(): ?bool
     {
         return $this->createdInNewEvents;
     }
@@ -134,7 +107,7 @@ class AsanaEvent
         return $this;
     }
 
-    public function getCreatedInNewEventsOnline(): ?bool
+    public function isCreatedInNewEventsOnline(): ?bool
     {
         return $this->createdInNewEventsOnline;
     }
@@ -146,7 +119,7 @@ class AsanaEvent
         return $this;
     }
 
-    public function getCreatedInFewTickets(): ?bool
+    public function isCreatedInFewTickets(): ?bool
     {
         return $this->createdInFewTickets;
     }
@@ -158,7 +131,7 @@ class AsanaEvent
         return $this;
     }
 
-    public function getCreatedInLastMinute(): ?bool
+    public function isCreatedInLastMinute(): ?bool
     {
         return $this->createdInLastMinute;
     }
@@ -170,7 +143,7 @@ class AsanaEvent
         return $this;
     }
 
-    public function getCreatedInNewEventsExternal(): ?bool
+    public function isCreatedInNewEventsExternal(): ?bool
     {
         return $this->createdInNewEventsExternal;
     }
@@ -182,7 +155,7 @@ class AsanaEvent
         return $this;
     }
 
-    public function getCreatedInCalendar(): ?bool
+    public function isCreatedInCalendar(): ?bool
     {
         return $this->createdInCalendar;
     }

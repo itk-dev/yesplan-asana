@@ -43,7 +43,7 @@ class AsanaEventManager
      */
     public function createCards(): void
     {
-        //get Yesplan events for the different boards/card types
+        // get Yesplan events for the different boards/card types
         $lastMinutEvents = $this->eventRepository->findLastMinutTickets();
         $fewTicketEvents = $this->eventRepository->findFewTickets();
         $eventsOnlineEvents = $this->eventRepository->findNewEventOnlineEvents();
@@ -51,7 +51,7 @@ class AsanaEventManager
         $eventsNewEventsExternal = $this->eventRepository->findNewProductionOnlineIncludingGratisandExternEvents();
         $calendarEvents = $this->eventRepository->findCalendarEvents();
 
-        //create the cards, and update asanaEvent table
+        // create the cards, and update asanaEvent table
         foreach ($lastMinutEvents as $lastMinuteEvent) {
             $eventData = $this->getEventData($this->eventRepository->find($lastMinuteEvent['id']));
             $this->asanaApiClient->createCardLastMinute($eventData);
