@@ -211,7 +211,7 @@ class AsanaApiClient
             $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
             $this->error('Card not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response->getContent(false)]);
         } else {
-            $this->debug('Card created yesplan_id: {yesplan_id}', ['yesplan_id' => $this->options['yesplan_id']]);
+            $this->info('Card created in asana project: {project_id}', ['project_id' => $projectId]);
             // @todo Store card in database.
         }
     }
@@ -290,7 +290,7 @@ class AsanaApiClient
                 $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
                 $this->error('Card with not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
             } else {
-                $this->debug('Card created yesplan_id: {yesplan_id}', ['yesplan_id' => $this->options['yesplan_id']]);
+                $this->info('Card created in asana project: {project_id}', ['project_id' => $projectId]);
             }
         }
     }

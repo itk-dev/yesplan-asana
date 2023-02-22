@@ -59,6 +59,7 @@ class YesplanEventRepository extends ServiceEntityRepository
              FROM App\Entity\YesplanEvent e
              WHERE e.eventDate < :timeNow'
         )->setParameter('timeNow', $timeNow->format('Y-m-d H:i:s:'));
+
         return $query->getResult();
     }
 
@@ -105,6 +106,7 @@ class YesplanEventRepository extends ServiceEntityRepository
              AND (y.profileId = :profileIdEkstern OR y.profileId = :profileIdGratis)
             '
         )->setParameters(['profileIdEkstern' => $this->options['yesplan_external_profile_id'], 'profileIdGratis' => $this->options['yesplan_free_profile_id']]);
+
         return $query->getResult();
     }
 
@@ -128,6 +130,7 @@ class YesplanEventRepository extends ServiceEntityRepository
              AND y.profileId = :profileId
             '
         )->setParameter('profileId', $this->options['yesplan_intern_profile_id']);
+
         return $query->getResult();
     }
 
@@ -155,6 +158,7 @@ class YesplanEventRepository extends ServiceEntityRepository
              AND y.profileId = :profileId
             '
         )->setParameter('profileId', $this->options['yesplan_intern_profile_id']);
+
         return $query->getResult();
     }
 
@@ -178,6 +182,7 @@ class YesplanEventRepository extends ServiceEntityRepository
              AND y.profileId = :profileId
             '
         )->setParameters(['nowPlus3Weeks' => date_format($nowPlus3Weeks, 'Y-m-d H:i:s'), 'profileId' => $this->options['yesplan_intern_profile_id']]);
+
         return $query->getResult();
     }
 
@@ -200,6 +205,7 @@ class YesplanEventRepository extends ServiceEntityRepository
                  AND y.profileId = :profileId
             '
         )->setParameter('profileId', $this->options['yesplan_intern_profile_id']);
+
         return $query->getResult();
     }
 }

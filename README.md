@@ -17,9 +17,9 @@ We only filter on events with the status = I salg/offentliggjort.
 ## Installation
 
 ```sh
-docker-compose up -d
-docker-compose exec phpfpm composer install
-docker-compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
+docker compose up -d
+docker compose exec phpfpm composer install
+docker compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
 ```
 
 ## Environment variables
@@ -83,22 +83,22 @@ Information on who should receive error mails (to), email address this is sent f
 ## Usage
 
 ```sh
-docker-compose exec phpfpm bin/console app:yesplan:get-events
+docker compose exec phpfpm bin/console app:yesplan:get-events
 ```
 ```sh
-docker-compose exec phpfpm bin/console app:yesplan:delete-old-events
+docker compose exec phpfpm bin/console app:yesplan:delete-old-events
 ```
 
 ```sh
-docker-compose exec phpfpm bin/console app:asana:create-cards
+docker compose exec phpfpm bin/console app:asana:create-cards
 ```
 
 ## Coding standards
 
 ```sh
-docker-compose exec phpfpm composer coding-standards-check
+docker compose exec phpfpm composer coding-standards-check
 ```
 
 ```sh
-docker-compose exec phpfpm composer coding-standards-apply
+docker compose exec phpfpm composer coding-standards-apply
 ```
