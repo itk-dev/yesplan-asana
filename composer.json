@@ -1,4 +1,6 @@
 {
+    "name": "itk-dev/yesplan-asana",
+    "description": "Application for ",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
