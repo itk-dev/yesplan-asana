@@ -97,10 +97,10 @@ class YesplanEvent
     #[ORM\Column(nullable: true)]
     private ?bool $inPresaleDateUpdated = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $eventDateUpdated = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $isNewEvent = null;
 
     public function getId(): ?string
