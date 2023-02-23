@@ -11,15 +11,15 @@ Profile = Internal events:
 
 Profile = External and free events:
   * 'EventsExtern': is defined as events with productionOnline from Yesplan = 1
-  
+
 We only filter on events with the status = I salg/offentliggjort.
 
 ## Installation
 
 ```sh
-docker-compose up -d
-docker-compose exec phpfpm composer install
-docker-compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
+docker compose up -d
+docker compose exec phpfpm composer install
+docker compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
 ```
 
 ## Environment variables
@@ -75,7 +75,7 @@ ASANA_CALENDAR_COLOR_FIELD_YELLOW=''
 This should contain SMTP address for error mail sending
 * MAILER_DSN=smtp://localhost
 
-Information on who should receive error mails (to), email address this is sent from, and a prefix for the email subject, could be "dev", "production" or whatever you like. 
+Information on who should receive error mails (to), email address this is sent from, and a prefix for the email subject, could be "dev", "production" or whatever you like.
 * MAIL_TO=''
 * MAIL_PREFIX=''
 * MAIL_FROM=''
@@ -83,22 +83,22 @@ Information on who should receive error mails (to), email address this is sent f
 ## Usage
 
 ```sh
-docker-compose exec phpfpm bin/console app:yesplan:get-events
+docker compose exec phpfpm bin/console app:yesplan:get-events
 ```
 ```sh
-docker-compose exec phpfpm bin/console app:yesplan:delete-old-events
+docker compose exec phpfpm bin/console app:yesplan:delete-old-events
 ```
 
 ```sh
-docker-compose exec phpfpm bin/console app:asana:create-cards
+docker compose exec phpfpm bin/console app:asana:create-cards
 ```
 
 ## Coding standards
 
 ```sh
-docker-compose exec phpfpm composer coding-standards-check
+docker compose exec phpfpm composer coding-standards-check
 ```
 
 ```sh
-docker-compose exec phpfpm composer coding-standards-apply
+docker compose exec phpfpm composer coding-standards-apply
 ```

@@ -18,7 +18,7 @@ trait LoggerTrait
     use BaseLoggerTrait;
     use LoggerAwareTrait;
 
-    public function log($level, $message, array $context = [])
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         if (null !== $this->logger) {
             $this->logger->log($level, $message, $context);

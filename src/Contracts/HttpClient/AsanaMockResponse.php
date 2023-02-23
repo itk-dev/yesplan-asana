@@ -48,7 +48,7 @@ class AsanaMockResponse implements ResponseInterface
     {
     }
 
-    public function getInfo(string $type = null)
+    public function getInfo(?string $type = null): mixed
     {
         return null;
     }
