@@ -57,12 +57,13 @@ Get the Asana Bearer from authorized Asana app. The Asana URL should probably be
 * ASANA_BEARER=''
 * ASANA_URL=''
 
-The following should contain the ID (ID's in commaseperated list) to the board(s) where cards will be created:
+The following should contain a JSON list of IDs of the boards where cards will be created:
 
-* ASANA_NEW_EVENT=''
-* ASANA_NEW_EVENT_ONLINE=''
-* ASANA_LAST_MINUTE=''
-* ASANA_FEW_TICKETS=''
+* ASANA_NEW_EVENT='[42, 87]'
+* ASANA_NEW_EVENT_ONLINE='[]'
+* ASANA_LAST_MINUTE='[]'
+* ASANA_FEW_TICKETS='[]'
+* ASANA_EXTERNAL_EVENT='[]'
 
 The following should contain the ID to the board you want to use in calendar view to show events on the presale date, in
 sale date and on the event date:

@@ -16,7 +16,6 @@ use App\Traits\LoggerTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -89,31 +88,11 @@ class AsanaApiClient
 
         $resolver->setDefault('dry-run', false);
 
-        $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_new_event_online', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_last_minute', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_few_tickets', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_external_event', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
+        $resolver->setAllowedTypes('asana_new_event', 'int[]');
+        $resolver->setAllowedTypes('asana_new_event_online', 'int[]');
+        $resolver->setAllowedTypes('asana_last_minute', 'int[]');
+        $resolver->setAllowedTypes('asana_few_tickets', 'int[]');
+        $resolver->setAllowedTypes('asana_external_event', 'int[]');
     }
 
     /**
