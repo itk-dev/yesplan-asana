@@ -1,4 +1,7 @@
 services:
+  phpfpm:
+    image: itkdev/php8.2-fpm:latest
+
   markdownlint:
     image: peterdavehello/markdownlint
     profiles:

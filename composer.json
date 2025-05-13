@@ -25,7 +25,7 @@
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.47",
-        "friendsofphp/php-cs-fixer": "^3.14",
+        "friendsofphp/php-cs-fixer": "^3.39",
         "symfony/maker-bundle": "^1.48"
     },
     "replace": {

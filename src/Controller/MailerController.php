@@ -29,18 +29,18 @@ class MailerController extends AbstractController
             ]);
     }
 
-     /**
-      * Send email to mail-adress defined in env, hvis subject prefix defined in env.
-      */
-     public function sendEmail(string $subject, string $message): void
-     {
-         $email = (new Email())
-         ->from($this->options['mail_from'])
-         ->to($this->options['mail_to'])
-         ->subject($this->options['mail_prefix'].' '.$subject)
-         ->text($message)
-         ->html($message);
+    /**
+     * Send email to mail-adress defined in env, hvis subject prefix defined in env.
+     */
+    public function sendEmail(string $subject, string $message): void
+    {
+        $email = (new Email())
+        ->from($this->options['mail_from'])
+        ->to($this->options['mail_to'])
+        ->subject($this->options['mail_prefix'].' '.$subject)
+        ->text($message)
+        ->html($message);
 
-         $this->mailer->send($email);
-     }
+        $this->mailer->send($email);
+    }
 }
