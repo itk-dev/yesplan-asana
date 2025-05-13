@@ -15,6 +15,7 @@ use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -58,7 +59,7 @@ class AsanaApiClient
         return $this->httpClient->request($method, $path, $options);
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'bearer',
@@ -272,5 +273,46 @@ class AsanaApiClient
                 $this->info('Card created in asana project: {project_id}', ['project_id' => $projectId]);
             }
         }
+    }
+
+    /**
+     * Check that we have access to all configured boards.
+     */
+    public function checkBoardIds(): array
+    {
+        $result = [];
+
+        $keys = [
+            'asana_new_event',
+            'asana_new_event_online',
+            'asana_last_minute',
+            'asana_few_tickets',
+            'asana_external_event',
+        ];
+        foreach ($keys as $key) {
+            $result[$key] = [];
+            foreach ($this->options[$key] as $id) {
+                try {
+                    $response = $this->request(Request::METHOD_GET, $this->options['asana_url'], [
+                        'query' => [
+                            'project' => $id,
+                            'limit' => 1,
+                        ],
+                    ]);
+                    $status = $response->getStatusCode();
+                    $response = $response->toArray(true);
+                } catch (\Throwable $t) {
+                    $status = $t->getCode();
+                    $response = $t->getMessage();
+                }
+                $result[$key][] = [
+                    'id' => $id,
+                    'status' => $status,
+                    'response' => $response,
+                ];
+            }
+        }
+
+        return $result;
     }
 }
