@@ -1,0 +1,7 @@
+services:
+  phpfpm:
+    image: itkdev/php8.2-fpm:alpine
+
+  nginx:
+    labels:
+      - "traefik.enable=false"
