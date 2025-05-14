@@ -245,24 +245,24 @@ class AsanaApiClient
         $url = $this->options['asana_url'];
         if (!empty($dueDate)) {
             $options = [
-            'body' => [
-                'name' => $values['title'],
-                'due_on' => $dueDate,
-                'custom_fields['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
-                'custom_fields['.$this->options['yesplan_id'].']' => $values['id'],
-                'custom_fields['.$this->options['yesplan_eventDate'].']' => $eventDate,
-                'custom_fields['.$this->options['yesplan_location'].']' => $values['location'],
-                'custom_fields['.$this->options['yesplan_genre'].']' => $values['genre'],
-                'custom_fields['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
-                'custom_fields['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
-                'custom_fields['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
-                'custom_fields['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
-                'custom_fields['.$this->options['yesplan_percent'].']' => $values['percent'],
-                'custom_fields['.$this->options['yesplan_status'].']' => $values['status'],
-                'custom_fields['.$this->options['yesplan_profile'].']' => $values['profile'],
-                'projects' => $projectId,
-            ],
-        ];
+                'body' => [
+                    'name' => $values['title'],
+                    'due_on' => $dueDate,
+                    'custom_fields['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
+                    'custom_fields['.$this->options['yesplan_id'].']' => $values['id'],
+                    'custom_fields['.$this->options['yesplan_eventDate'].']' => $eventDate,
+                    'custom_fields['.$this->options['yesplan_location'].']' => $values['location'],
+                    'custom_fields['.$this->options['yesplan_genre'].']' => $values['genre'],
+                    'custom_fields['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
+                    'custom_fields['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
+                    'custom_fields['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
+                    'custom_fields['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
+                    'custom_fields['.$this->options['yesplan_percent'].']' => $values['percent'],
+                    'custom_fields['.$this->options['yesplan_status'].']' => $values['status'],
+                    'custom_fields['.$this->options['yesplan_profile'].']' => $values['profile'],
+                    'projects' => $projectId,
+                ],
+            ];
 
             $response = $this->post($url, $options);
 

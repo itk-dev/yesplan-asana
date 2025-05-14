@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class AsanaCheckBoardIdsCommand extends Command
 {
     public function __construct(
-        private readonly AsanaApiClient $asanaApiClient
+        private readonly AsanaApiClient $asanaApiClient,
     ) {
         parent::__construct();
     }

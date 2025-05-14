@@ -1,7 +1,5 @@
 services:
-  phpfpm:
-    image: itkdev/php8.2-fpm:alpine
-
   nginx:
     labels:
+      # This project does not have a web frontend.
       - "traefik.enable=false"
