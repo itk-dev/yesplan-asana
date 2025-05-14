@@ -26,7 +26,7 @@ class MailerController extends AbstractController
             'mail_to',
             'mail_prefix',
             'mail_from',
-            ]);
+        ]);
     }
 
     /**
