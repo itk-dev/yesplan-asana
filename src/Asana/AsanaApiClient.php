@@ -15,8 +15,8 @@ use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -59,7 +59,7 @@ class AsanaApiClient
         return $this->httpClient->request($method, $path, $options);
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'bearer',
@@ -89,31 +89,11 @@ class AsanaApiClient
 
         $resolver->setDefault('dry-run', false);
 
-        $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_new_event_online', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_last_minute', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_few_tickets', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_external_event', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
+        $resolver->setAllowedTypes('asana_new_event', 'int[]');
+        $resolver->setAllowedTypes('asana_new_event_online', 'int[]');
+        $resolver->setAllowedTypes('asana_last_minute', 'int[]');
+        $resolver->setAllowedTypes('asana_few_tickets', 'int[]');
+        $resolver->setAllowedTypes('asana_external_event', 'int[]');
     }
 
     /**
@@ -265,24 +245,24 @@ class AsanaApiClient
         $url = $this->options['asana_url'];
         if (!empty($dueDate)) {
             $options = [
-            'body' => [
-                'name' => $values['title'],
-                'due_on' => $dueDate,
-                'custom_fields['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
-                'custom_fields['.$this->options['yesplan_id'].']' => $values['id'],
-                'custom_fields['.$this->options['yesplan_eventDate'].']' => $eventDate,
-                'custom_fields['.$this->options['yesplan_location'].']' => $values['location'],
-                'custom_fields['.$this->options['yesplan_genre'].']' => $values['genre'],
-                'custom_fields['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
-                'custom_fields['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
-                'custom_fields['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
-                'custom_fields['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
-                'custom_fields['.$this->options['yesplan_percent'].']' => $values['percent'],
-                'custom_fields['.$this->options['yesplan_status'].']' => $values['status'],
-                'custom_fields['.$this->options['yesplan_profile'].']' => $values['profile'],
-                'projects' => $projectId,
-            ],
-        ];
+                'body' => [
+                    'name' => $values['title'],
+                    'due_on' => $dueDate,
+                    'custom_fields['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
+                    'custom_fields['.$this->options['yesplan_id'].']' => $values['id'],
+                    'custom_fields['.$this->options['yesplan_eventDate'].']' => $eventDate,
+                    'custom_fields['.$this->options['yesplan_location'].']' => $values['location'],
+                    'custom_fields['.$this->options['yesplan_genre'].']' => $values['genre'],
+                    'custom_fields['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
+                    'custom_fields['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
+                    'custom_fields['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
+                    'custom_fields['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
+                    'custom_fields['.$this->options['yesplan_percent'].']' => $values['percent'],
+                    'custom_fields['.$this->options['yesplan_status'].']' => $values['status'],
+                    'custom_fields['.$this->options['yesplan_profile'].']' => $values['profile'],
+                    'projects' => $projectId,
+                ],
+            ];
 
             $response = $this->post($url, $options);
 
@@ -293,5 +273,46 @@ class AsanaApiClient
                 $this->info('Card created in asana project: {project_id}', ['project_id' => $projectId]);
             }
         }
+    }
+
+    /**
+     * Check that we have access to all configured boards.
+     */
+    public function checkBoardIds(): array
+    {
+        $result = [];
+
+        $keys = [
+            'asana_new_event',
+            'asana_new_event_online',
+            'asana_last_minute',
+            'asana_few_tickets',
+            'asana_external_event',
+        ];
+        foreach ($keys as $key) {
+            $result[$key] = [];
+            foreach ($this->options[$key] as $id) {
+                try {
+                    $response = $this->request(Request::METHOD_GET, $this->options['asana_url'], [
+                        'query' => [
+                            'project' => $id,
+                            'limit' => 1,
+                        ],
+                    ]);
+                    $status = $response->getStatusCode();
+                    $response = $response->toArray(true);
+                } catch (\Throwable $t) {
+                    $status = $t->getCode();
+                    $response = $t->getMessage();
+                }
+                $result[$key][] = [
+                    'id' => $id,
+                    'status' => $status,
+                    'response' => $response,
+                ];
+            }
+        }
+
+        return $result;
     }
 }

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- [PR-28](https://github.com/itk-dev/yesplan-asana/pull/28)
+  Upgraded to Symfony 6.4
+- [PR-27](https://github.com/itk-dev/yesplan-asana/pull/27)
+  - Cleaned up
+  - Updated handling of board IDs
+
 ### Changed
 
 - Updated GitHub workflow images.
