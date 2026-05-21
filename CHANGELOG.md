@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-05-21
+
 - [PR-28](https://github.com/itk-dev/yesplan-asana/pull/28)
   Upgraded to Symfony 6.4
 - [PR-27](https://github.com/itk-dev/yesplan-asana/pull/27)
@@ -58,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First version of Yesplan-asana.
 
 [Unreleased]: https://github.com/itk-dev/yesplan-asana/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/itk-dev/yesplan-asana/compare/2.1.0...2.1.0
 [2.1.0]: https://github.com/itk-dev/yesplan-asana/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/itk-dev/yesplan-asana/compare/1.2.1...2.0.0
 [1.2.1]: https://github.com/itk-dev/yesplan-asana/compare/1.2.0...1.2.1
