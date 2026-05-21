@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-05-21
+
+- [PR-29](https://github.com/itk-dev/yesplan-asana/pull/29)
+  Security update
 - [PR-28](https://github.com/itk-dev/yesplan-asana/pull/28)
   Upgraded to Symfony 6.4
 - [PR-27](https://github.com/itk-dev/yesplan-asana/pull/27)
