@@ -268,7 +268,7 @@ class AsanaApiClient
 
             if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
                 $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-                $this->error('Card with not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
+                $this->error('Card with not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response->getContent(throw: false)]);
             } else {
                 $this->info('Card created in asana project: {project_id}', ['project_id' => $projectId]);
             }
