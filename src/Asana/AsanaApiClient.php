@@ -29,6 +29,20 @@ class AsanaApiClient
 
     /** @var HttpClientInterface */
     private $httpClient;
+
+    /**
+     * Date format used by Asana for `due_on` and other "on" timestamp
+     * (cf. https://developers.asana.com/reference/createtask).
+     */
+    private const ASANA_DATE_FORMAT = 'Y-m-d';
+
+    /**
+     * @todo This format should probably be \DateTimeInterface::ATOM, i.e. ISO 8601.
+     *
+     * "This (due_at, Ed.) takes an ISO 8601 date string in UTC"
+     *
+     * https://developers.asana.com/reference/createtask
+     */
     private const DATETIME_FORMAT = 'Y-m-d H:i:s';
 
     public function __construct(array $asanaApiClientOptions, MailerController $mailer, LoggerInterface $logger)
@@ -204,9 +218,9 @@ class AsanaApiClient
      */
     public function createCalendarCard(string $projectId, array $values): void
     {
-        $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::DATETIME_FORMAT) : '';
-        $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format(self::DATETIME_FORMAT) : '';
-        $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format(self::DATETIME_FORMAT) : '';
+        $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::ASANA_DATE_FORMAT) : null;
+        $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format(self::ASANA_DATE_FORMAT) : null;
+        $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format(self::ASANA_DATE_FORMAT) : null;
 
         $insaleDateUpdated = $values['inSaleDateUpdated'];
         $inPresaleDateUpdated = $values['inPresaleDateUpdated'];
@@ -235,7 +249,7 @@ class AsanaApiClient
      * @param projectID id of the board the card should be created on
      * @param values array containing information about the event created
      */
-    private function createCardWithColorCode(string $dueDate, string $colorCodeId, array $values, string $projectId)
+    private function createCardWithColorCode(?string $dueDate, string $colorCodeId, array $values, string $projectId)
     {
         $publicationDate = !empty($values['publicationdate']) ? $values['publicationdate']->format(self::DATETIME_FORMAT) : '';
         $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::DATETIME_FORMAT) : '';
@@ -268,7 +282,7 @@ class AsanaApiClient
 
             if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
                 $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-                $this->error('Card with not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
+                $this->error('Card with not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response->getContent(throw: false)]);
             } else {
                 $this->info('Card created in asana project: {project_id}', ['project_id' => $projectId]);
             }
