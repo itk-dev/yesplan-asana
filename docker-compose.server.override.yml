@@ -1,0 +1,5 @@
+services:
+  nginx:
+    labels:
+      # This project does not have a web frontend.
+      - "traefik.enable=false"

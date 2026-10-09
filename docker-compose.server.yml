@@ -1,6 +1,4 @@
-# itk-version: 3.0.0
-version: "3"
-
+# itk-version: 3.2.4
 networks:
   frontend:
     external: true
@@ -10,7 +8,7 @@ networks:
 
 services:
   phpfpm:
-    image: itkdev/php8.1-fpm:alpine
+    image: itkdev/php8.4-fpm:alpine
     restart: unless-stopped
     networks:
       - app
@@ -19,7 +17,6 @@ services:
     environment:
       - PHP_MAX_EXECUTION_TIME=30
       - PHP_MEMORY_LIMIT=128M
-      - COMPOSER_VERSION=2
     volumes:
       - .:/app
 
@@ -31,18 +28,25 @@ services:
       - frontend
     depends_on:
       - phpfpm
-    ports:
-      - '8080'
     volumes:
-      - ./.docker/vhost.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./.docker/templates:/etc/nginx/templates:ro
       - ./.docker/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./:/app:rw
+      - .:/app
+    environment:
+      NGINX_FPM_SERVICE: ${COMPOSE_PROJECT_NAME:?}-phpfpm-1:9000
+      NGINX_CRON_METRICS: ${COMPOSE_PROJECT_NAME:?}-phpfpm-1:9746
+      NGINX_WEB_ROOT: /app/public
+      NGINX_PORT: 8080
+      NGINX_MAX_BODY_SIZE: 5M
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=frontend"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.rule=Host(`${COMPOSE_SERVER_DOMAIN}`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.entrypoints=web"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-http.rule=Host(`${COMPOSE_SERVER_DOMAIN:?}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-http.entrypoints=web"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${COMPOSE_SERVER_DOMAIN}`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}.rule=Host(`${COMPOSE_SERVER_DOMAIN:?}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}.entrypoints=websecure"
+      # Cron-metrics protection.
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-metrics.rule=Host(`${COMPOSE_SERVER_DOMAIN:?}`) && PathPrefix(`/cron-metrics`) "
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-metrics.middlewares=ITKMetricsAuth@file"

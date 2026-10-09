@@ -15,8 +15,8 @@ use App\Controller\MailerController;
 use App\Traits\LoggerTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -29,6 +29,20 @@ class AsanaApiClient
 
     /** @var HttpClientInterface */
     private $httpClient;
+
+    /**
+     * Date format used by Asana for `due_on` and other "on" timestamp
+     * (cf. https://developers.asana.com/reference/createtask).
+     */
+    private const ASANA_DATE_FORMAT = 'Y-m-d';
+
+    /**
+     * @todo This format should probably be \DateTimeInterface::ATOM, i.e. ISO 8601.
+     *
+     * "This (due_at, Ed.) takes an ISO 8601 date string in UTC"
+     *
+     * https://developers.asana.com/reference/createtask
+     */
     private const DATETIME_FORMAT = 'Y-m-d H:i:s';
 
     public function __construct(array $asanaApiClientOptions, MailerController $mailer, LoggerInterface $logger)
@@ -59,7 +73,7 @@ class AsanaApiClient
         return $this->httpClient->request($method, $path, $options);
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'bearer',
@@ -89,31 +103,11 @@ class AsanaApiClient
 
         $resolver->setDefault('dry-run', false);
 
-        $resolver->setNormalizer('asana_new_event', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_new_event_online', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_last_minute', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_few_tickets', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
-        $resolver->setNormalizer('asana_external_event', function (Options $options, $value) {
-            $value = explode(',', $value);
-
-            return $value;
-        });
+        $resolver->setAllowedTypes('asana_new_event', 'int[]');
+        $resolver->setAllowedTypes('asana_new_event_online', 'int[]');
+        $resolver->setAllowedTypes('asana_last_minute', 'int[]');
+        $resolver->setAllowedTypes('asana_few_tickets', 'int[]');
+        $resolver->setAllowedTypes('asana_external_event', 'int[]');
     }
 
     /**
@@ -224,9 +218,9 @@ class AsanaApiClient
      */
     public function createCalendarCard(string $projectId, array $values): void
     {
-        $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::DATETIME_FORMAT) : '';
-        $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format(self::DATETIME_FORMAT) : '';
-        $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format(self::DATETIME_FORMAT) : '';
+        $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::ASANA_DATE_FORMAT) : null;
+        $presaleDate = !empty($values['presaleDate']) ? $values['presaleDate']->format(self::ASANA_DATE_FORMAT) : null;
+        $insaleDate = !empty($values['insaleDate']) ? $values['insaleDate']->format(self::ASANA_DATE_FORMAT) : null;
 
         $insaleDateUpdated = $values['inSaleDateUpdated'];
         $inPresaleDateUpdated = $values['inPresaleDateUpdated'];
@@ -255,7 +249,7 @@ class AsanaApiClient
      * @param projectID id of the board the card should be created on
      * @param values array containing information about the event created
      */
-    private function createCardWithColorCode(string $dueDate, string $colorCodeId, array $values, string $projectId)
+    private function createCardWithColorCode(?string $dueDate, string $colorCodeId, array $values, string $projectId)
     {
         $publicationDate = !empty($values['publicationdate']) ? $values['publicationdate']->format(self::DATETIME_FORMAT) : '';
         $eventDate = !empty($values['eventdate']) ? $values['eventdate']->format(self::DATETIME_FORMAT) : '';
@@ -265,33 +259,74 @@ class AsanaApiClient
         $url = $this->options['asana_url'];
         if (!empty($dueDate)) {
             $options = [
-            'body' => [
-                'name' => $values['title'],
-                'due_on' => $dueDate,
-                'custom_fields['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
-                'custom_fields['.$this->options['yesplan_id'].']' => $values['id'],
-                'custom_fields['.$this->options['yesplan_eventDate'].']' => $eventDate,
-                'custom_fields['.$this->options['yesplan_location'].']' => $values['location'],
-                'custom_fields['.$this->options['yesplan_genre'].']' => $values['genre'],
-                'custom_fields['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
-                'custom_fields['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
-                'custom_fields['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
-                'custom_fields['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
-                'custom_fields['.$this->options['yesplan_percent'].']' => $values['percent'],
-                'custom_fields['.$this->options['yesplan_status'].']' => $values['status'],
-                'custom_fields['.$this->options['yesplan_profile'].']' => $values['profile'],
-                'projects' => $projectId,
-            ],
-        ];
+                'body' => [
+                    'name' => $values['title'],
+                    'due_on' => $dueDate,
+                    'custom_fields['.$this->options['asana_calendar_colorfield'].']' => $colorCodeId,
+                    'custom_fields['.$this->options['yesplan_id'].']' => $values['id'],
+                    'custom_fields['.$this->options['yesplan_eventDate'].']' => $eventDate,
+                    'custom_fields['.$this->options['yesplan_location'].']' => $values['location'],
+                    'custom_fields['.$this->options['yesplan_genre'].']' => $values['genre'],
+                    'custom_fields['.$this->options['yesplan_marketingBudget'].']' => $values['marketingBudget'],
+                    'custom_fields['.$this->options['yesplan_publicationDate'].']' => $publicationDate,
+                    'custom_fields['.$this->options['yesplan_presaleDate'].']' => $presaleDate,
+                    'custom_fields['.$this->options['yesplan_insaleDate'].']' => $insaleDate,
+                    'custom_fields['.$this->options['yesplan_percent'].']' => $values['percent'],
+                    'custom_fields['.$this->options['yesplan_status'].']' => $values['status'],
+                    'custom_fields['.$this->options['yesplan_profile'].']' => $values['profile'],
+                    'projects' => $projectId,
+                ],
+            ];
 
             $response = $this->post($url, $options);
 
             if (!(Response::HTTP_CREATED === $response->getStatusCode())) {
                 $this->mailer->sendEmail('Error creating card', 'Error '.$response->getStatusCode().'URL: '.$url.'projectID: '.$projectId);
-                $this->error('Card with not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response]);
+                $this->error('Card with not created {status_code}, response {response}', ['status_code' => $response->getStatusCode(), 'response' => $response->getContent(throw: false)]);
             } else {
                 $this->info('Card created in asana project: {project_id}', ['project_id' => $projectId]);
             }
         }
+    }
+
+    /**
+     * Check that we have access to all configured boards.
+     */
+    public function checkBoardIds(): array
+    {
+        $result = [];
+
+        $keys = [
+            'asana_new_event',
+            'asana_new_event_online',
+            'asana_last_minute',
+            'asana_few_tickets',
+            'asana_external_event',
+        ];
+        foreach ($keys as $key) {
+            $result[$key] = [];
+            foreach ($this->options[$key] as $id) {
+                try {
+                    $response = $this->request(Request::METHOD_GET, $this->options['asana_url'], [
+                        'query' => [
+                            'project' => $id,
+                            'limit' => 1,
+                        ],
+                    ]);
+                    $status = $response->getStatusCode();
+                    $response = $response->toArray(true);
+                } catch (\Throwable $t) {
+                    $status = $t->getCode();
+                    $response = $t->getMessage();
+                }
+                $result[$key][] = [
+                    'id' => $id,
+                    'status' => $status,
+                    'response' => $response,
+                ];
+            }
+        }
+
+        return $result;
     }
 }

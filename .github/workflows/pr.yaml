@@ -1,0 +1,27 @@
+name: Review
+
+env:
+  COMPOSE_USER: root
+
+on: pull_request
+
+jobs:
+  validate-doctrine-schema:
+    runs-on: ubuntu-latest
+    name: Validate Doctrine Schema
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - run: |
+          docker network create frontend
+          docker compose up --detach --wait
+          docker compose exec phpfpm composer install
+
+      - name: Run Doctrine Migrations
+        run: |
+          docker compose exec phpfpm bin/console doctrine:migrations:migrate --no-interaction
+
+      - name: Validate Doctrine schema
+        run: |
+          docker compose exec phpfpm bin/console doctrine:schema:validate

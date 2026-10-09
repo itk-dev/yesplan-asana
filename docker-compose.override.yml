@@ -1,0 +1,7 @@
+services:
+  markdownlint:
+    image: peterdavehello/markdownlint
+    profiles:
+      - dev
+    volumes:
+      - ./:/md
