@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-10-08
+
 - [PR-30](https://github.com/itk-dev/yesplan-asana/pull/30)
   Applied correct Asana date format
 
@@ -64,7 +66,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First version of Yesplan-asana.
 
-[Unreleased]: https://github.com/itk-dev/yesplan-asana/compare/2.1.0...HEAD
+[Unreleased]: https://github.com/itk-dev/yesplan-asana/compare/2.1.1...HEAD
+[2.1.1]: https://github.com/itk-dev/yesplan-asana/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/itk-dev/yesplan-asana/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/itk-dev/yesplan-asana/compare/1.2.1...2.0.0
 [1.2.1]: https://github.com/itk-dev/yesplan-asana/compare/1.2.0...1.2.1
